@@ -1,0 +1,22 @@
+<resources>
+
+    <string name="app_name">Requirements</string>
+
+    <string name="request_button">Request</string>
+
+    <string name="case_network_title">Network</string>
+    <string name="case_network_message">This application requires network connection. Right now you
+        seem to be off-line. Would you like to establish a network connection from settings page?</string>
+
+    <string name="case_location_permission_title">Location permission</string>
+    <string name="case_location_permission_rationale_message">This application requires a location
+        permission. Would you like to grant it?</string>
+    <string name="case_location_permission_never_message">But why? :( Without location this
+        application cannot function. Would you like to be redirected to settings page to grant
+        location permission manually?</string>
+
+    <string name="case_location_services_title">Location services</string>
+    <string name="case_location_services_message">This action requires location services to be on.
+        Do you wan to turn them on?</string>
+
+</resources>

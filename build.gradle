@@ -1,0 +1,39 @@
+buildscript {
+    
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+    group 'ru.noties'
+    version VERSION_NAME
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion '4.3'
+    distributionType 'all'
+}
+
+ext {
+
+    MIN_SDK = 16
+    TARGET_SDK = 26
+    BUILD_TOOLS = '26.0.3'
+
+    final def supportVersion = '26.1.0'
+    SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$supportVersion"
+    RECYCLER_VIEW = "com.android.support:recyclerview-v7:$supportVersion"
+}
