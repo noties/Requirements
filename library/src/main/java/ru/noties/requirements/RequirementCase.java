@@ -22,20 +22,6 @@ import android.support.annotation.Nullable;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class RequirementCase {
 
-    public enum Result {
-
-        /**
-         * Indicates that requirement successfully resolved
-         */
-        SUCCESS,
-
-        /**
-         * Indicates that requirement resolution process was cancelled, was not resolved
-         * or cannot be resolved. One can provide {@link Payload} to identify exact case
-         */
-        FAILURE
-    }
-
     /**
      * Synchronous method to check if requirement is satisfied
      *
@@ -110,21 +96,22 @@ public abstract class RequirementCase {
     /**
      * Call this method after resolution has finished (in whatever case: success or cancellation)
      *
-     * @param result {@link Result} to indicate result of requirement resolution
-     * @see #deliverResult(Result, Payload)
+     * @param result true for success, false for failure
+     * @since 1.0.1
      */
-    protected void deliverResult(@NonNull Result result) {
+    protected void deliverResult(boolean result) {
         deliverResult(result, null);
     }
 
     /**
      * Call this method after resolution has finished (in whatever case: success or cancellation)
      *
-     * @param result  {@link Result} to indicate result of requirement resolution
-     * @param payload {@link Payload} to identify _error_ state. Please note that it will be ignored in case of {@link Result#SUCCESS}
+     * @param result  true for success, false for failure
+     * @param payload {@link Payload} to identify _error_ state. Please note that it will be ignored in case of success result
+     * @since 1.0.1
      */
     @SuppressWarnings("SameParameterValue")
-    protected void deliverResult(@NonNull Result result, @Nullable Payload payload) {
+    protected void deliverResult(boolean result, @Nullable Payload payload) {
         callback().onRequirementCaseResult(result, payload);
     }
 
@@ -161,6 +148,7 @@ public abstract class RequirementCase {
 
 
     interface Callback {
-        void onRequirementCaseResult(@NonNull Result result, @Nullable Payload payload);
+        // since 1.0.1
+        void onRequirementCaseResult(boolean result, @Nullable Payload payload);
     }
 }

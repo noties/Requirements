@@ -7,14 +7,19 @@ import android.support.annotation.NonNull;
  * `requestPermissions`
  *
  * @see #createRequestCode(String)
+ * @see #createRequestCode(Class)
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class RequestCode {
 
     public static final int MAX = 0xffff;
 
     public static int createRequestCode(@NonNull String tag) {
         return Math.abs(tag.hashCode() % MAX);
+    }
+
+    public static int createRequestCode(@NonNull Class<?> type) {
+        return createRequestCode(type.getName());
     }
 
     private RequestCode() {

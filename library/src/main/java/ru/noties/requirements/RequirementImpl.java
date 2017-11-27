@@ -137,7 +137,7 @@ class RequirementImpl extends Requirement
     }
 
     @Override
-    public void onRequirementCaseResult(@NonNull RequirementCase.Result result, @Nullable Payload payload) {
+    public void onRequirementCaseResult(boolean result, @Nullable Payload payload) {
 
         final RequirementCase current = currentCase();
 
@@ -145,21 +145,14 @@ class RequirementImpl extends Requirement
 
             current.detach();
 
-            switch (result) {
-
-                case SUCCESS:
-                    deque.pop();
-                    validate();
-                    break;
-
-                case FAILURE:
-                    listenerSource.onRequirementFailure(payload);
-                    end(false);
-                    break;
-
-                default:
-                    throw new IllegalStateException("Unknown type of result: " + result);
+            if (result) {
+                deque.pop();
+                validate();
+            } else {
+                listenerSource.onRequirementFailure(payload);
+                end(false);
             }
+
         } else {
             throw new IllegalStateException("Unexpected state inside Requirement. RequirementCase delivered a result " +
                     "whilst this Requirement has no pending cases");

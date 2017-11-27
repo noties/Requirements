@@ -14,7 +14,7 @@ import ru.noties.requirements.sample.R;
 
 public class LocationServicesCase extends RequirementCase {
 
-    private static final int REQUEST_CODE = RequestCode.createRequestCode(LocationServicesCase.class.getName());
+    private static final int REQUEST_CODE = RequestCode.createRequestCode(LocationServicesCase.class);
 
     @Override
     public boolean meetsRequirement() {
@@ -42,7 +42,7 @@ public class LocationServicesCase extends RequirementCase {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         if (!bool.value()) {
-                            deliverResult(Result.FAILURE);
+                            deliverResult(false);
                         }
                     }
                 })
@@ -52,10 +52,7 @@ public class LocationServicesCase extends RequirementCase {
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_CODE == requestCode) {
-            final Result result = meetsRequirement()
-                    ? Result.SUCCESS
-                    : Result.FAILURE;
-            deliverResult(result);
+            deliverResult(meetsRequirement());
             return true;
         }
         return false;
@@ -64,6 +61,7 @@ public class LocationServicesCase extends RequirementCase {
     private static boolean servicesEnabled(@NonNull Context context) {
         final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         return locationManager != null
-                && (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+                && (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
     }
 }

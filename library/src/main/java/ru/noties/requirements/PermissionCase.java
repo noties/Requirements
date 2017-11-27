@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
 /**
@@ -25,13 +26,14 @@ import android.support.annotation.NonNull;
 public abstract class PermissionCase extends RequirementCase {
 
     private final String permission;
+
     private final int requestCode;
 
     public PermissionCase(@NonNull String permission) {
         this(permission, RequestCode.createRequestCode(permission));
     }
 
-    public PermissionCase(@NonNull String permission, int requestCode) {
+    public PermissionCase(@NonNull String permission, @IntRange(from = 0) int requestCode) {
         this.permission = permission;
         this.requestCode = requestCode;
     }
@@ -57,7 +59,7 @@ public abstract class PermissionCase extends RequirementCase {
     }
 
     /**
-     * Should display rationale. Further actions must be taken in this method: either {@link #deliverResult(Result)}
+     * Should display rationale. Further actions must be taken in this method: either {@link #deliverResult(boolean)}
      * with cancellation event or {@link #requestPermission()}
      */
     protected abstract void showPermissionRationale();
@@ -68,7 +70,7 @@ public abstract class PermissionCase extends RequirementCase {
      * implementation exits immediately with cancellation event
      */
     protected void showExplanationOnNever() {
-        deliverResult(Result.FAILURE);
+        deliverResult(false);
     }
 
     /**
@@ -98,10 +100,7 @@ public abstract class PermissionCase extends RequirementCase {
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (this.requestCode == requestCode) {
-            final Result result = meetsRequirement()
-                    ? Result.SUCCESS
-                    : Result.FAILURE;
-            deliverResult(result);
+            deliverResult(meetsRequirement());
             return true;
         }
         return false;
@@ -115,14 +114,14 @@ public abstract class PermissionCase extends RequirementCase {
         if (this.requestCode == requestCode) {
             if (grantResults.length > 0
                     && PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                deliverResult(Result.SUCCESS);
+                deliverResult(true);
             } else {
                 // check if user turned on NEVER
                 if (!shouldShowRequestPermissionRationale(permission)) {
                     // never
                     showExplanationOnNever();
                 } else {
-                    deliverResult(Result.FAILURE);
+                    deliverResult(false);
                 }
             }
             return true;
@@ -135,6 +134,10 @@ public abstract class PermissionCase extends RequirementCase {
         return permission;
     }
 
+    /**
+     * @return automatically generated requestCode
+     * @see RequestCode#createRequestCode(String)
+     */
     public int requestCode() {
         return requestCode;
     }

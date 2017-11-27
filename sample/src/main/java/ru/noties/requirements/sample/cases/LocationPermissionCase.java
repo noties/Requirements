@@ -33,7 +33,7 @@ public class LocationPermissionCase extends PermissionCase {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         if (!bool.value()) {
-                            deliverResult(Result.FAILURE);
+                            deliverResult(false);
                         }
                     }
                 })
@@ -60,7 +60,7 @@ public class LocationPermissionCase extends PermissionCase {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         if (!bool.value()) {
-                            deliverResult(Result.FAILURE);
+                            deliverResult(false);
                         }
                     }
                 })

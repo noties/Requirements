@@ -15,7 +15,7 @@ import ru.noties.requirements.sample.R;
 
 public class NetworkCase extends RequirementCase {
 
-    private static final int REQUEST_CODE = RequestCode.createRequestCode(NetworkCase.class.getName());
+    private static final int REQUEST_CODE = RequestCode.createRequestCode(NetworkCase.class);
 
     @Override
     public boolean meetsRequirement() {
@@ -48,7 +48,7 @@ public class NetworkCase extends RequirementCase {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         if (!bool.value()) {
-                            deliverResult(Result.FAILURE);
+                            deliverResult(false);
                         }
                     }
                 })
@@ -58,17 +58,15 @@ public class NetworkCase extends RequirementCase {
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_CODE == requestCode) {
-            final Result result = meetsRequirement()
-                    ? Result.SUCCESS
-                    : Result.FAILURE;
-            deliverResult(result);
+            deliverResult(meetsRequirement());
             return true;
         }
         return false;
     }
 
     private static boolean hasConnection(@NonNull Context context) {
-        final ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager manager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo info = manager != null
                 ? manager.getActiveNetworkInfo()
                 : null;
