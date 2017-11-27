@@ -54,6 +54,7 @@ class EventSourceImpl extends EventSource {
 
         @Override
         public void unsubscribe() {
+            // null check in case called unsubscribe multiple times
             if (listener != null) {
                 listeners.remove(listener);
                 listener = null;

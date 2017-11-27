@@ -60,6 +60,29 @@ class RequirementImpl extends Requirement
         }
     }
 
+    @Override
+    public void cancel() {
+        cancel(null);
+    }
+
+    @Override
+    public void cancel(@Nullable Payload payload) {
+
+        final RequirementCase current = currentCase();
+        if (current != null) {
+            current.detach();
+        }
+
+        listenerSource.onRequirementFailure(payload);
+
+        end(false);
+    }
+
+    @Override
+    public boolean isInProgress() {
+        return subscription != null;
+    }
+
     @Nullable
     private RequirementCase currentCase() {
         return deque.peek();

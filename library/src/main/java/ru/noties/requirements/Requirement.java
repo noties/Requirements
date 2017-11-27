@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
  * @see RequirementBuilder
  * @see RequirementBuilder#create()
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
 
     /**
@@ -37,4 +38,31 @@ public abstract class Requirement {
      * @param listener {@link Listener} to be notified about resolution progress
      */
     public abstract void validate(@NonNull Listener listener);
+
+    /**
+     * A method to cancel requirement resolution process. The same as calling {@link #cancel(Payload)}
+     * with null payload
+     *
+     * @see #cancel(Payload)
+     * @see #isInProgress()
+     * @since 1.0.1
+     */
+    public abstract void cancel();
+
+    /**
+     * A method to cancel requirement resolution process. If there are active listeners, they will
+     * receive supplied payload in {@link Listener#onRequirementFailure(Payload)}
+     *
+     * @param payload {@link Payload} to pass to active listeners of resolution process
+     * @since 1.0.1
+     */
+    public abstract void cancel(@Nullable Payload payload);
+
+    /**
+     * A method to check if requirement resolution is currently in progress
+     *
+     * @return a boolean indicating if requirement resolution is in progress
+     * @since 1.0.1
+     */
+    public abstract boolean isInProgress();
 }
