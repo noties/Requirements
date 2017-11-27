@@ -17,6 +17,21 @@ dependencies {
     api SUPPORT_ANNOTATIONS
 }
 
+task javadoc(type: Javadoc) {
+
+    dependsOn 'cleanJavadoc'
+
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    destinationDir = file("../docs/")
+    title = 'Requirements'
+    failOnError false
+}
+
+task cleanJavadoc(type: Delete) {
+    delete file('../docs')
+}
+
 if (project.hasProperty('release')) {
     apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 }
