@@ -16,5 +16,4 @@ android {
 
 dependencies {
     implementation project(':library')
-    implementation RECYCLER_VIEW
 }

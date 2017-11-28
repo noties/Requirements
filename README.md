@@ -2,7 +2,7 @@
 
 Small utility library for Android to evaluate requirements in order for some action to proceed. For example: network connection, permissions (API 23), system services (location, bluetooth, ...), etc.
 
-[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/requirements.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%requirements%22)
+[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/requirements.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22requirements%22)
 
 ```gradle
 implementation 'ru.noties:requirements:1.0.1'
