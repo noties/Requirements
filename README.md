@@ -93,17 +93,48 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 }
 ```
 
+### Validation
+
+It's a good thing to start validation process in reaction to some action (button click, etc).
+
+```java
+requirement.validate(new Requirement.Listener() {
+    @Override
+    public void onRequirementSuccess() {
+        // can proceed now
+    }
+
+    @Override
+    public void onRequirementFailure(@Nullable Payload payload) {
+        // cannot
+    }
+});
+```
+
+If requirements must be validated during some lifecycle event (onStart, etc), one can use `requirement.isInProgress()` method call to check if requirement is currently in progress.
+
+### Cancellation
+
+Requirement resolution can be cancelled by:
+* `RequirementCase` by calling `deliverResult(boolean)` and `deliverResult(boolean, Payload)`
+* calling `Requirement#cancel()` and `Requirement#cancel(Payload)`
+
+### Cancellation payload
+
+In order to react and take actions when requirement resolution was cancelled a simple type `Payload` was introduced. It's a `interface` with no methods defined to ensure type safety. It can contain data to identify specific cancellation case, which will be delivered to validation listener.
+
+
 ### Dialogs in resolution
 
 It's aboslutely crucial that after `startResolution` is called `RequirementCase` must deliver success or cancellation event (it can be postponed for example until `onActivityResult` or `onRequestPermissionsResult` is delivered). Otheriwse the requirements chain will break.
 
-In case of showing a dialog in `startResolution`, it's advicable to track the dismiss state of a dialog. Library provides utility class `MutableBool` that can help keep track of dialog state:
+In case of showing a dialog in `startResolution`, it's advisable to track the dismiss state of a dialog. Library provides utility class `MutableBool` that can help keep track of dialog state:
 
 ```java
 
 final MutableBool bool = new MutableBool();
 
-new AlertDialogBuilder(activity())
+new AlertDialog.Builder(activity())
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -138,7 +169,7 @@ Please note that if a `Requirement#validate` is called and `Requirement#isInProg
 
 Sometimes our creative abilities give us a hard time and we sit hours thinking of ideal request code:
 
-```
+```java
 private static final int LOCATION_PERMISSION_REQUEST_CODE = 72;
 ```
 
@@ -147,4 +178,97 @@ It's great time and I won't trade it for anything. Still, if you wish, there is 
 ```java
 RequestCode.createRequestCode(String);
 RequestCode.createRequestCode(Class<?>);
+```
+
+### Permissions
+
+To deal with Android runtime permissions (introduced on devices starting API 23), there is a base class to help with them - `PermissionCase`. It requires only one method to be implemented: `void showPermissionRationale`.
+
+```java
+public class LocationPermissionCase extends PermissionCase {
+
+    public LocationPermissionCase() {
+        super(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    @Override
+    protected void showPermissionRationale() {
+
+        final MutableBool bool = new MutableBool();
+
+        new AlertDialog.Builder(activity())
+                .setTitle(R.string.case_location_permission_title)
+                .setMessage(R.string.case_location_permission_rationale_message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bool.setValue(true);
+                        requestPermission();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if (!bool.value()) {
+                            deliverResult(false);
+                        }
+                    }
+                })
+                .show();
+    }
+}
+```
+
+If it's required to check if user selected `never` on permission request dialog, there is also a way to deal with it (by default it delivers cancellation result):
+
+```java
+@Override
+protected void showExplanationOnNever() {
+
+    final MutableBool bool = new MutableBool();
+
+    new AlertDialog.Builder(activity())
+            .setTitle(R.string.case_location_permission_title)
+            .setMessage(R.string.case_location_permission_never_message)
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    bool.setValue(true);
+                    navigateToSettingsScreen();
+                }
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (!bool.value()) {
+                        deliverResult(false);
+                    }
+                }
+            })
+            .show();
+}
+```
+
+Aside from that `PermissionCase` offers these helper methods:
+* `void requestPermission()`
+* `void navigateToSettingsScreen()` - useful when implementing permission logic on user selected `never`
+
+## License
+
+```
+  Copyright 2017 Dimitry Ivanov (mail@dimitryivanov.ru)
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 ```
