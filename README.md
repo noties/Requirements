@@ -1,4 +1,4 @@
-# Requirements
+# Requirements<sup><i>*</i></sup>
 
 Small utility library for Android to evaluate requirements in order for some action to proceed. For example: network connection, permissions (API 23), system services (location, bluetooth, ...), etc.
 
@@ -93,6 +93,8 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 }
 ```
 
+Please note that although it's possible to define EventSource in a Fragment one should not do it. `RequirementCase` starts activites and requests permissions from specified Activity (with which `Requirements` was built), so, most likely, a Fragment's EventSource won't receive events.
+
 ### Validation
 
 It's a good thing to start validation process in reaction to some action (button click, etc).
@@ -126,7 +128,7 @@ In order to react and take actions when requirement resolution was cancelled a s
 
 ### Dialogs in resolution
 
-It's aboslutely crucial that after `startResolution` is called `RequirementCase` must deliver success or cancellation event (it can be postponed for example until `onActivityResult` or `onRequestPermissionsResult` is delivered). Otheriwse the requirements chain will break.
+It's aboslutely crucial that after `startResolution` is called `RequirementCase` must deliver success or cancellation event (it can be postponed for example until `onActivityResult` or `onRequestPermissionsResult` is delivered). Otherwise the requirements chain will break.
 
 In case of showing a dialog in `startResolution`, it's advisable to track the dismiss state of a dialog. Library provides utility class `MutableBool` that can help keep track of dialog state:
 
@@ -163,7 +165,7 @@ Internally `Requirement` listens for supplied activity lifecycle events and disp
 
 ### Multiple listeners
 
-Please note that if a `Requirement#validate` is called and `Requirement#isInProgress` is true, supplied listener won't trigger the whole validation process again but unstead will subscribe for the final result (with other listeners).
+Please note that if a `Requirement#validate` is called and `Requirement#isInProgress` is true, supplied listener won't trigger the whole validation process again but instead will subscribe for the final result (with other listeners).
 
 ### Request code
 
