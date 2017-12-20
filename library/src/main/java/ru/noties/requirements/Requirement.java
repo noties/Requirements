@@ -4,12 +4,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * @see #builder()
  * @see RequirementBuilder
- * @see RequirementBuilder#create()
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
+
+    // todo: update javadoc
 
     /**
      * Listener to be notified about requirement resolution process
@@ -29,16 +29,6 @@ public abstract class Requirement {
          * @param payload {@link Payload} to identify this cancellation event
          */
         void onRequirementFailure(@Nullable Payload payload);
-    }
-
-    /**
-     * Factory method to obtain an instance of {@link RequirementBuilder}
-     *
-     * @return an instance of {@link RequirementBuilder} to construct a {@link Requirement}
-     */
-    @NonNull
-    public static RequirementBuilder builder() {
-        return RequirementBuilder.create();
     }
 
     /**

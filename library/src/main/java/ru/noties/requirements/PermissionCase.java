@@ -1,6 +1,5 @@
 package ru.noties.requirements;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -8,6 +7,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 
 /**
  * A helper case to ease the pressure working with Android permissions. {@link #PermissionCase(String)}
@@ -22,8 +22,8 @@ import android.support.annotation.NonNull;
  * </ul>
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-@TargetApi(Build.VERSION_CODES.M)
-public abstract class PermissionCase extends RequirementCase {
+@RequiresApi(Build.VERSION_CODES.M)
+public abstract class PermissionCase<T> extends RequirementCase<T> {
 
     private final String permission;
 

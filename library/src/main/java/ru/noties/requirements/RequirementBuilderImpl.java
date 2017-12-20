@@ -1,6 +1,5 @@
 package ru.noties.requirements;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -8,19 +7,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class RequirementBuilderImpl extends RequirementBuilder {
+class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
-    private List<RequirementCase> requirementCases;
+    private EventDispatcher<T> dispatcher;
+    private EventSource source;
+    private List<RequirementCase<? extends T>> requirementCases;
 
     private boolean isBuilt;
 
-    RequirementBuilderImpl() {
+    RequirementBuilderImpl(@NonNull EventDispatcher<T> dispatcher, @NonNull EventSource source) {
+        this.dispatcher = dispatcher;
+        this.source = source;
         this.requirementCases = new ArrayList<>(3);
     }
 
     @NonNull
     @Override
-    public RequirementBuilder add(@NonNull RequirementCase requirementCase) {
+    public RequirementBuilder<T> add(@NonNull RequirementCase<? extends T> requirementCase) {
 
         checkState();
 
@@ -31,7 +34,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addIf(boolean result, @NonNull RequirementCase requirementCase) {
+    public RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? extends T> requirementCase) {
 
         checkState();
 
@@ -44,11 +47,11 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addAll(@NonNull Collection<? extends RequirementCase> requirementCases) {
+    public RequirementBuilder<T> addAll(@NonNull Collection<? extends RequirementCase<? extends T>> requirementCases) {
 
         checkState();
 
-        for (RequirementCase requirementCase : requirementCases) {
+        for (RequirementCase<? extends T> requirementCase : requirementCases) {
             Preconditions.checkNonNull(requirementCase, "Cannot add null RequirementCase");
             add(requirementCase);
         }
@@ -58,7 +61,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addAllIf(boolean result, @NonNull Collection<? extends RequirementCase> requirementCases) {
+    public RequirementBuilder<T> addAllIf(boolean result, @NonNull Collection<? extends RequirementCase<? extends T>> requirementCases) {
 
         checkState();
 
@@ -71,19 +74,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder fork() {
-
-        checkState();
-
-        final RequirementBuilderImpl builder = new RequirementBuilderImpl();
-        builder.requirementCases.addAll(requirementCases);
-
-        return builder;
-    }
-
-    @NonNull
-    @Override
-    public Requirement build(@NonNull Activity activity, @NonNull EventSource eventSource) {
+    public Requirement build() {
 
         checkState();
 
@@ -91,9 +82,9 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
         try {
             return new RequirementImpl(
-                    activity,
-                    eventSource,
-                    Collections.unmodifiableList(requirementCases)
+                    dispatcher,
+                    source,
+                    Collections.unmodifiableList((List<? extends RequirementCase>) requirementCases)
             );
         } finally {
             requirementCases = null;

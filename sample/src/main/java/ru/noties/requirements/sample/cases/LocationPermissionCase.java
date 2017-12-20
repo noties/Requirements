@@ -1,13 +1,17 @@
 package ru.noties.requirements.sample.cases;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import ru.noties.requirements.Flag;
 import ru.noties.requirements.PermissionCase;
 import ru.noties.requirements.sample.R;
 
-public class LocationPermissionCase extends PermissionCase {
+@RequiresApi(Build.VERSION_CODES.M)
+public class LocationPermissionCase extends PermissionCase<Activity> {
 
     public LocationPermissionCase() {
         super(Manifest.permission.ACCESS_FINE_LOCATION);
