@@ -51,6 +51,14 @@ public abstract class Requirement {
     public abstract void validate(@NonNull Listener listener);
 
     /**
+     * Synchronous method to check if the whole requirement cases chain meets requirement. Simply
+     * returns true or false without triggering requirement resolution
+     *
+     * @return a boolean indicating if this requirement is valid (meets requirement)
+     */
+    public abstract boolean isValid();
+
+    /**
      * A method to cancel requirement resolution process. The same as calling {@link #cancel(Payload)}
      * with null payload
      *

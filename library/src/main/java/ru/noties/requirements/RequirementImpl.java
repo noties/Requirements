@@ -61,6 +61,20 @@ class RequirementImpl extends Requirement
     }
 
     @Override
+    public boolean isValid() {
+        boolean result = true;
+        for (RequirementCase requirementCase : requirementCases) {
+            requirementCase.attach(activity, this);
+            result = requirementCase.meetsRequirement();
+            requirementCase.detach();
+            if (!result) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void cancel() {
         cancel(null);
     }

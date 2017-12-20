@@ -12,7 +12,6 @@ import ru.noties.requirements.BuildUtils;
 import ru.noties.requirements.EventSource;
 import ru.noties.requirements.Payload;
 import ru.noties.requirements.Requirement;
-import ru.noties.requirements.RequirementBuilder;
 import ru.noties.requirements.sample.cases.LocationPermissionCase;
 import ru.noties.requirements.sample.cases.LocationServicesCase;
 import ru.noties.requirements.sample.cases.NetworkCase;
@@ -68,7 +67,7 @@ public class MainActivity extends Activity {
             return;
         }
 
-        requirement = RequirementBuilder.create()
+        requirement = Requirement.builder()
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())
