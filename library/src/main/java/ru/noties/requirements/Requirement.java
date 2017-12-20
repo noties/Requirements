@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 /**
  * @see RequirementBuilder
+ * @see RequirementBuilder#create(EventDispatcher, EventSource)
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
@@ -45,6 +46,7 @@ public abstract class Requirement {
      * returns true or false without triggering requirement resolution
      *
      * @return a boolean indicating if this requirement is valid (meets requirement)
+     * @since 1.1.0
      */
     public abstract boolean isValid();
 

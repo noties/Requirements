@@ -7,6 +7,9 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
+/**
+ * @since 1.1.0
+ */
 @SuppressWarnings("WeakerAccess")
 public class EventDispatcherActivity<A extends Activity> extends EventDispatcher<A> {
 

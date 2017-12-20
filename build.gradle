@@ -14,7 +14,7 @@ allprojects {
         google()
         jcenter()
     }
-    group 'ru.noties'
+    group GROUP
     version VERSION_NAME
 }
 

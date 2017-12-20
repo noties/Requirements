@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+// @since 1.1.0
 class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     private EventDispatcher<T> dispatcher;
@@ -87,15 +88,15 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
                     Collections.unmodifiableList((List<? extends RequirementCase>) requirementCases)
             );
         } finally {
+            dispatcher = null;
+            source = null;
             requirementCases = null;
         }
     }
 
     private void checkState() {
         if (isBuilt) {
-            throw new IllegalStateException("This RequirementBuilder instance was already built. If you " +
-                    "need to create multiple Requirements sharing some cases, use `fork()` method of this builder " +
-                    "before it was built.");
+            throw new IllegalStateException("This RequirementBuilder instance has already been built.");
         }
     }
 }

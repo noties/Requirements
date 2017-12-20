@@ -13,6 +13,8 @@ import android.support.annotation.Nullable;
  * Represents stateless requirement case.
  * <p>
  * Library provides a subclass for easier interaction with Android Permissions, see: {@link PermissionCase}
+ * <p>
+ * Changed in 1.1.0: added type parameter to indicate `target` of this requirement case
  *
  * @see #meetsRequirement()
  * @see #startResolution()
@@ -84,6 +86,11 @@ public abstract class RequirementCase<T> {
         return dispatcher().activity();
     }
 
+    /**
+     * @return target of this requirement case
+     * @see EventDispatcher#target()
+     * @see 1.1.0
+     */
     @NonNull
     protected T target() {
         return dispatcher().target();
@@ -95,6 +102,7 @@ public abstract class RequirementCase<T> {
         return callback;
     }
 
+    // @since 1.1.0
     @NonNull
     private EventDispatcher<T> dispatcher() {
         Preconditions.checkNonNull(dispatcher, "This requirement case is not attached: " + getClass().getSimpleName());
@@ -144,7 +152,7 @@ public abstract class RequirementCase<T> {
 
 
     interface Callback {
-        // since 1.0.1
+        // @since 1.0.1
         void onRequirementCaseResult(boolean result, @Nullable Payload payload);
     }
 }

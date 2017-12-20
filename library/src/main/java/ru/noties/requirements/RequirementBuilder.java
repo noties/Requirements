@@ -8,6 +8,8 @@ import java.util.Collection;
  * Builder class to create a {@link Requirement}.
  * <p>
  * Please note that one instance of this builder can be built exactly once.
+ * <p>
+ * Changed in 1.1.0: added type argument
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public abstract class RequirementBuilder<T> {
@@ -16,6 +18,8 @@ public abstract class RequirementBuilder<T> {
      * Factory method to obtain an instance of {@link RequirementBuilder}
      *
      * @return new instance of {@link RequirementBuilder}
+     * @see EventDispatcher
+     * @see EventSource
      */
     @NonNull
     public static <T> RequirementBuilder<T> create(@NonNull EventDispatcher<T> eventDispatcher, @NonNull EventSource eventSource) {

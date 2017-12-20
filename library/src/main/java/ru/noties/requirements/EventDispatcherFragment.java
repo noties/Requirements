@@ -8,6 +8,9 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
+/**
+ * @since 1.1.0
+ */
 @SuppressWarnings("WeakerAccess")
 public class EventDispatcherFragment<F extends Fragment> extends EventDispatcher<F> {
 
