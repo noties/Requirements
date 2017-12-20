@@ -16,7 +16,7 @@ In order to correctly react to a user action we must make sure that all requirem
 The aim of this library is to detach requirements' resolution process from the code and give flexibility to add/remove requirements on-the-go.
 
 ```java
-final Requirement requirement = RequirementBuilder.create()
+final Requirement requirement = Requirement.builder()
         .add(new NetworkCase())
         .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
         .add(new LocationServicesCase())
