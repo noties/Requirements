@@ -30,7 +30,7 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> add(@NonNull RequirementCase<? extends T> requirementCase)
+    public abstract RequirementBuilder<T> add(@NonNull RequirementCase<? super T> requirementCase)
             throws IllegalStateException;
 
     /**
@@ -42,7 +42,7 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? extends T> requirementCase)
+    public abstract RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? super T> requirementCase)
             throws IllegalStateException;
 
     /**
@@ -55,7 +55,7 @@ public abstract class RequirementBuilder<T> {
      */
     @NonNull
     public abstract RequirementBuilder<T> addAll(
-            @NonNull Collection<? extends RequirementCase<? extends T>> requirementCases
+            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
     ) throws IllegalStateException;
 
     /**
@@ -70,7 +70,7 @@ public abstract class RequirementBuilder<T> {
     @NonNull
     public abstract RequirementBuilder<T> addAllIf(
             boolean result,
-            @NonNull Collection<? extends RequirementCase<? extends T>> requirementCases
+            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
     ) throws IllegalStateException;
 
     /**

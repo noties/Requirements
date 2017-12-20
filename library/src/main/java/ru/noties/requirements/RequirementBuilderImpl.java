@@ -11,7 +11,7 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     private EventDispatcher<T> dispatcher;
     private EventSource source;
-    private List<RequirementCase<? extends T>> requirementCases;
+    private List<RequirementCase<? super T>> requirementCases;
 
     private boolean isBuilt;
 
@@ -23,7 +23,7 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     @NonNull
     @Override
-    public RequirementBuilder<T> add(@NonNull RequirementCase<? extends T> requirementCase) {
+    public RequirementBuilder<T> add(@NonNull RequirementCase<? super T> requirementCase) {
 
         checkState();
 
@@ -34,7 +34,7 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     @NonNull
     @Override
-    public RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? extends T> requirementCase) {
+    public RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? super T> requirementCase) {
 
         checkState();
 
@@ -47,11 +47,11 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     @NonNull
     @Override
-    public RequirementBuilder<T> addAll(@NonNull Collection<? extends RequirementCase<? extends T>> requirementCases) {
+    public RequirementBuilder<T> addAll(@NonNull Collection<? extends RequirementCase<? super T>> requirementCases) {
 
         checkState();
 
-        for (RequirementCase<? extends T> requirementCase : requirementCases) {
+        for (RequirementCase<? super T> requirementCase : requirementCases) {
             Preconditions.checkNonNull(requirementCase, "Cannot add null RequirementCase");
             add(requirementCase);
         }
@@ -61,7 +61,7 @@ class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
     @NonNull
     @Override
-    public RequirementBuilder<T> addAllIf(boolean result, @NonNull Collection<? extends RequirementCase<? extends T>> requirementCases) {
+    public RequirementBuilder<T> addAllIf(boolean result, @NonNull Collection<? extends RequirementCase<? super T>> requirementCases) {
 
         checkState();
 

@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
             return;
         }
 
-        requirement = RequirementBuilder.create(EventDispatcher.create((Activity) this), eventSource)
+        requirement = RequirementBuilder.create(EventDispatcher.create(this), eventSource)
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())
