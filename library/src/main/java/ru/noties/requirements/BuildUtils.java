@@ -38,7 +38,7 @@ public abstract class BuildUtils {
             N_MR1, // 7.1
             O // 8.0
     })
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     @interface SdkVersion {
     }
 
