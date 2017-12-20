@@ -3,7 +3,7 @@ package ru.noties.requirements.sample.cases;
 import android.Manifest;
 import android.content.DialogInterface;
 
-import ru.noties.requirements.MutableBool;
+import ru.noties.requirements.Flag;
 import ru.noties.requirements.PermissionCase;
 import ru.noties.requirements.sample.R;
 
@@ -16,7 +16,7 @@ public class LocationPermissionCase extends PermissionCase {
     @Override
     protected void showPermissionRationale() {
 
-        final MutableBool bool = new MutableBool();
+        final Flag flag = Flag.create();
 
         new AlertDialogBuilder(activity())
                 .setTitle(R.string.case_location_permission_title)
@@ -24,7 +24,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        bool.setValue(true);
+                        flag.mark();
                         requestPermission();
                     }
                 })
@@ -32,7 +32,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (!bool.value()) {
+                        if (!flag.isSet()) {
                             deliverResult(false);
                         }
                     }
@@ -43,7 +43,7 @@ public class LocationPermissionCase extends PermissionCase {
     @Override
     protected void showExplanationOnNever() {
 
-        final MutableBool bool = new MutableBool();
+        final Flag flag = Flag.create();
 
         new AlertDialogBuilder(activity())
                 .setTitle(R.string.case_location_permission_title)
@@ -51,7 +51,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        bool.setValue(true);
+                        flag.mark();
                         navigateToSettingsScreen();
                     }
                 })
@@ -59,7 +59,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (!bool.value()) {
+                        if (!flag.isSet()) {
                             deliverResult(false);
                         }
                     }

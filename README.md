@@ -130,11 +130,11 @@ In order to react and take actions when requirement resolution was cancelled a s
 
 It's aboslutely crucial that after `startResolution` is called `RequirementCase` must deliver success or cancellation event (it can be postponed for example until `onActivityResult` or `onRequestPermissionsResult` is delivered). Otherwise the requirements chain will break.
 
-In case of showing a dialog in `startResolution`, it's advisable to track the dismiss state of a dialog. Library provides utility class `MutableBool` that can help keep track of dialog state:
+In case of showing a dialog in `startResolution`, it's advisable to track the dismiss state of a dialog. Library provides utility class `Flag` that can help keep track of dialog state:
 
 ```java
 
-final MutableBool bool = new MutableBool();
+final Flag flag = Flag.create();
 
 new AlertDialog.Builder(activity())
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -142,7 +142,7 @@ new AlertDialog.Builder(activity())
             public void onClick(DialogInterface dialog, int which) {
 
 				// mark as success
-                bool.setValue(true);
+                flag.mark();
 
                 // for example, start activity for result
             }
@@ -151,7 +151,7 @@ new AlertDialog.Builder(activity())
         .setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if (!bool.value()) {
+                if (!flag.isSet()) {
                     deliverResult(false);
                 }
             }
@@ -196,7 +196,7 @@ public class LocationPermissionCase extends PermissionCase {
     @Override
     protected void showPermissionRationale() {
 
-        final MutableBool bool = new MutableBool();
+        final Flag flag = Flag.create();
 
         new AlertDialog.Builder(activity())
                 .setTitle(R.string.case_location_permission_title)
@@ -204,7 +204,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        bool.setValue(true);
+                        flag.mark();
                         requestPermission();
                     }
                 })
@@ -212,7 +212,7 @@ public class LocationPermissionCase extends PermissionCase {
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (!bool.value()) {
+                        if (!flag.isSet()) {
                             deliverResult(false);
                         }
                     }
@@ -228,7 +228,7 @@ If it's required to check if user selected `never` on permission request dialog,
 @Override
 protected void showExplanationOnNever() {
 
-    final MutableBool bool = new MutableBool();
+    final Flag flag = Flag.create();
 
     new AlertDialog.Builder(activity())
             .setTitle(R.string.case_location_permission_title)
@@ -236,7 +236,7 @@ protected void showExplanationOnNever() {
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    bool.setValue(true);
+                    flag.mark();
                     navigateToSettingsScreen();
                 }
             })
@@ -244,7 +244,7 @@ protected void showExplanationOnNever() {
             .setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    if (!bool.value()) {
+                    if (!flag.isSet()) {
                         deliverResult(false);
                     }
                 }
