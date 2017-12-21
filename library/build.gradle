@@ -15,6 +15,7 @@ android {
 
 dependencies {
     api SUPPORT_ANNOTATIONS
+    api LISTENERS
 }
 
 task javadoc(type: Javadoc) {

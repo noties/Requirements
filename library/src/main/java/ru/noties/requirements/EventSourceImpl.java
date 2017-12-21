@@ -3,12 +3,11 @@ package ru.noties.requirements;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import ru.noties.listeners.Listeners;
 
 class EventSourceImpl extends EventSource {
 
-    private final List<Listener> listeners = new ArrayList<>(3);
+    private final Listeners<Listener> listeners = Listeners.create(3);
 
     EventSourceImpl() {
     }
@@ -18,8 +17,8 @@ class EventSourceImpl extends EventSource {
 
         boolean result = false;
 
-        for (int i = listeners.size() - 1; i >= 0; i--) {
-            result |= listeners.get(i).onActivityResult(requestCode, resultCode, data);
+        for (Listener listener : listeners.begin()) {
+            result |= listener.onActivityResult(requestCode, resultCode, data);
         }
 
         return result;
@@ -30,8 +29,8 @@ class EventSourceImpl extends EventSource {
 
         boolean result = false;
 
-        for (int i = listeners.size() - 1; i >= 0; i--) {
-            result |= listeners.get(i).onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for (Listener listener : listeners.begin()) {
+            result |= listener.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
         return result;
@@ -40,7 +39,6 @@ class EventSourceImpl extends EventSource {
     @NonNull
     @Override
     public Subscription subscribe(@NonNull Listener listener) {
-        listeners.add(listener);
         return new SubscriptionImpl(listener);
     }
 
@@ -50,6 +48,7 @@ class EventSourceImpl extends EventSource {
 
         private SubscriptionImpl(@NonNull Listener listener) {
             this.listener = listener;
+            listeners.add(listener);
         }
 
         @Override
