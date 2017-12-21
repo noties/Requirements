@@ -5,7 +5,7 @@ Small utility library for Android to evaluate requirements in order for some act
 [![Maven Central](https://img.shields.io/maven-central/v/ru.noties/requirements.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22requirements%22)
 
 ```gradle
-implementation 'ru.noties:requirements:1.0.1'
+implementation 'ru.noties:requirements:1.1.0'
 ```
 
 
@@ -16,11 +16,11 @@ In order to correctly react to a user action we must make sure that all requirem
 The aim of this library is to detach requirements' resolution process from the code and give flexibility to add/remove requirements on-the-go.
 
 ```java
-final Requirement requirement = Requirement.builder()
+final Requirement requirement = RequirementBuilder.create(EventDispatcher.create(this), eventSource)
         .add(new NetworkCase())
         .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
         .add(new LocationServicesCase())
-        .build(this, eventSource);
+        .build();
 ```
 
 The pivot point of this library is the `RequirementCase`. It encapsulates one single case that must be met before an action can go further. It will receive `onActivityResult` and `onRequestPermissionsResult` events and can react to them if needed. In general: `RequirementCase` is state-less container that validates if requirement case is met and, if not, **starts resolution**.
@@ -70,6 +70,20 @@ public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
+### Event dispatcher
+
+In order to decouple a `RequirementCase` from `Activity` `EventDispatcher` type was introduced. It is used to dispatch these events:
+
+* startActivityForResult
+* requestPermission
+* checkSelfPermission
+* shouldShowRequestPermissionRationale
+
+Library provides 2 implementations:
+
+* `EventDispatcherActivity` - `EventDispatcher.create(Activity)`
+* `EventDispatcherFragment` - `EventDispatcher.create(Fragment)`
+
 ### Event source
 
 In order for `RequirementCase` to react to Activity events, `EventSource` must be used. Obtain an instance of it by calling: `EventSource.create()`. Then redirect `onActivityResult` and `onRequestPermissionsResult` to it. Each method returns a boolean indicating if event was consumed.
@@ -93,7 +107,7 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 }
 ```
 
-Please note that although it's possible to define EventSource in a Fragment one should not do it. `RequirementCase` starts activites and requests permissions from specified Activity (with which `Requirements` was built), so, most likely, a Fragment's EventSource won't receive events.
+>Please note that if an `EventDispatcher` is established via `Fragment` (thus dispatching events via Fragment methods), EventSource must also be intialized inside _that_ fragment (otherwise you won't receive any events).
 
 ### Validation
 
@@ -114,6 +128,8 @@ requirement.validate(new Requirement.Listener() {
 ```
 
 If requirements must be validated during some lifecycle event (onStart, etc), one can use `requirement.isInProgress()` method call to check if requirement is currently in progress.
+
+There is also a synchronous method `isValid()` that returns `true|false` and does **not** start resolution.
 
 ### Cancellation
 
