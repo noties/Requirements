@@ -33,6 +33,11 @@ task cleanJavadoc(type: Delete) {
     delete file('../docs')
 }
 
+afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    // still cannot find a way o disable generation of empty R file
+}
+
 if (project.hasProperty('release')) {
     apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 }
