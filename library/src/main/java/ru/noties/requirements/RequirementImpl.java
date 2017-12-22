@@ -13,6 +13,8 @@ import java.util.List;
 class RequirementImpl extends Requirement
         implements EventSource.Listener, RequirementCase.Callback {
 
+    private EventDispatcher eventDispatcher;
+
     private Activity activity;
 
     private EventSource eventSource;
@@ -26,11 +28,11 @@ class RequirementImpl extends Requirement
     private EventSource.Subscription subscription;
 
     RequirementImpl(
-            @NonNull Activity activity,
+            @NonNull EventDispatcher eventDispatcher,
             @NonNull EventSource eventSource,
             @NonNull List<RequirementCase> requirementCases
     ) {
-        this.activity = activity;
+        this.eventDispatcher = eventDispatcher;
         this.eventSource = eventSource;
         this.requirementCases = requirementCases;
         this.deque = new ArrayDeque<>(requirementCases.size() + 1);
@@ -38,7 +40,8 @@ class RequirementImpl extends Requirement
 
         // register listener to be notified about activity destroyed event
         // so we can release everything
-        activity.getApplication().registerActivityLifecycleCallbacks(new ActivityDestroyedListener());
+        this.activity = eventDispatcher.activity();
+        this.activity.getApplication().registerActivityLifecycleCallbacks(new ActivityDestroyedListener());
     }
 
     @Override
@@ -58,6 +61,21 @@ class RequirementImpl extends Requirement
 
             validate();
         }
+    }
+
+    @Override
+    public boolean isValid() {
+        boolean result = true;
+        for (RequirementCase requirementCase : requirementCases) {
+            //noinspection unchecked
+            requirementCase.attach(eventDispatcher, this);
+            result = requirementCase.meetsRequirement();
+            requirementCase.detach();
+            if (!result) {
+                break;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -103,7 +121,8 @@ class RequirementImpl extends Requirement
     private void validate() {
         final RequirementCase current = currentCase();
         if (current != null) {
-            current.attach(activity, this);
+            //noinspection unchecked
+            current.attach(eventDispatcher, this);
             if (!current.meetsRequirement()) {
                 current.startResolution();
             } else {
@@ -180,6 +199,7 @@ class RequirementImpl extends Requirement
 
                 listenerSource.clear();
 
+                eventDispatcher = null;
                 activity = null;
                 eventSource = null;
                 requirementCases = null;

@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -14,13 +13,15 @@ import android.support.annotation.Nullable;
  * Represents stateless requirement case.
  * <p>
  * Library provides a subclass for easier interaction with Android Permissions, see: {@link PermissionCase}
+ * <p>
+ * Changed in 1.1.0: added type parameter to indicate `target` of this requirement case
  *
  * @see #meetsRequirement()
  * @see #startResolution()
  * @see PermissionCase
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class RequirementCase {
+public abstract class RequirementCase<T> {
 
     /**
      * Synchronous method to check if requirement is satisfied
@@ -36,17 +37,17 @@ public abstract class RequirementCase {
     public abstract void startResolution();
 
 
-    private Activity activity;
+    private EventDispatcher<T> dispatcher;
     private Callback callback;
 
 
-    public final void attach(@NonNull Activity activity, @NonNull Callback callback) {
-        this.activity = activity;
+    public final void attach(@NonNull EventDispatcher<T> dispatcher, @NonNull Callback callback) {
+        this.dispatcher = dispatcher;
         this.callback = callback;
     }
 
     public final void detach() {
-        this.activity = null;
+        this.dispatcher = null;
         this.callback = null;
     }
 
@@ -74,8 +75,7 @@ public abstract class RequirementCase {
      */
     @NonNull
     protected Context appContext() {
-        Preconditions.checkNonNull(activity, "This requirement is not attached to activity: " + getClass().getSimpleName());
-        return activity.getApplicationContext();
+        return activity().getApplicationContext();
     }
 
     /**
@@ -83,14 +83,30 @@ public abstract class RequirementCase {
      */
     @NonNull
     protected Activity activity() {
-        Preconditions.checkNonNull(activity, "This requirement is not attached to activity: " + getClass().getSimpleName());
-        return activity;
+        return dispatcher().activity();
+    }
+
+    /**
+     * @return target of this requirement case
+     * @see EventDispatcher#target()
+     * @since 1.1.0
+     */
+    @NonNull
+    protected T target() {
+        return dispatcher().target();
     }
 
     @NonNull
     private Callback callback() {
-        Preconditions.checkNonNull(callback, "This requirement is not attached to activity: " + getClass().getSimpleName());
+        Preconditions.checkNonNull(callback, "This requirement case is not attached: " + getClass().getSimpleName());
         return callback;
+    }
+
+    // @since 1.1.0
+    @NonNull
+    private EventDispatcher<T> dispatcher() {
+        Preconditions.checkNonNull(dispatcher, "This requirement case is not attached: " + getClass().getSimpleName());
+        return dispatcher;
     }
 
     /**
@@ -115,40 +131,28 @@ public abstract class RequirementCase {
         callback().onRequirementCaseResult(result, payload);
     }
 
-    /**
-     * Helper method to `activity().startActivityForResult(Intent,int)`
-     */
     protected void startActivityForResult(@NonNull Intent intent, @IntRange(from = 0, to = RequestCode.MAX) int requestCode) {
-        activity().startActivityForResult(intent, requestCode);
+        dispatcher().startActivityForResult(intent, requestCode);
     }
 
-    /**
-     * Helper method to `activity().requestPermissions(String[], int)`
-     */
     @TargetApi(Build.VERSION_CODES.M)
     protected void requestPermission(@NonNull String permission, @IntRange(from = 0, to = RequestCode.MAX) int requestCode) {
-        activity().requestPermissions(new String[]{permission}, requestCode);
+        dispatcher().requestPermission(permission, requestCode);
     }
 
-    /**
-     * Helper method to `activity().checkSelfPermission(String) == PackageManager.PERMISSION_GRANTED`
-     */
     @TargetApi(Build.VERSION_CODES.M)
     protected boolean checkSelfPermission(@NonNull String permission) {
-        return activity().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        return dispatcher().checkSelfPermission(permission);
     }
 
-    /**
-     * Helper method to `activity().shouldShowRequestPermissionRationale(String)`
-     */
     @TargetApi(Build.VERSION_CODES.M)
     protected boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
-        return activity().shouldShowRequestPermissionRationale(permission);
+        return dispatcher().shouldShowRequestPermissionRationale(permission);
     }
 
 
     interface Callback {
-        // since 1.0.1
+        // @since 1.0.1
         void onRequirementCaseResult(boolean result, @Nullable Payload payload);
     }
 }

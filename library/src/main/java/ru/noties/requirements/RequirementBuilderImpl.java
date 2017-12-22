@@ -1,6 +1,5 @@
 package ru.noties.requirements;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -8,19 +7,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class RequirementBuilderImpl extends RequirementBuilder {
+// @since 1.1.0
+class RequirementBuilderImpl<T> extends RequirementBuilder<T> {
 
-    private List<RequirementCase> requirementCases;
+    private EventDispatcher<T> dispatcher;
+    private EventSource source;
+    private List<RequirementCase<? super T>> requirementCases;
 
     private boolean isBuilt;
 
-    RequirementBuilderImpl() {
+    RequirementBuilderImpl(@NonNull EventDispatcher<T> dispatcher, @NonNull EventSource source) {
+        this.dispatcher = dispatcher;
+        this.source = source;
         this.requirementCases = new ArrayList<>(3);
     }
 
     @NonNull
     @Override
-    public RequirementBuilder add(@NonNull RequirementCase requirementCase) {
+    public RequirementBuilder<T> add(@NonNull RequirementCase<? super T> requirementCase) {
 
         checkState();
 
@@ -31,7 +35,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addIf(boolean result, @NonNull RequirementCase requirementCase) {
+    public RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? super T> requirementCase) {
 
         checkState();
 
@@ -44,11 +48,11 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addAll(@NonNull Collection<? extends RequirementCase> requirementCases) {
+    public RequirementBuilder<T> addAll(@NonNull Collection<? extends RequirementCase<? super T>> requirementCases) {
 
         checkState();
 
-        for (RequirementCase requirementCase : requirementCases) {
+        for (RequirementCase<? super T> requirementCase : requirementCases) {
             Preconditions.checkNonNull(requirementCase, "Cannot add null RequirementCase");
             add(requirementCase);
         }
@@ -58,7 +62,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder addAllIf(boolean result, @NonNull Collection<? extends RequirementCase> requirementCases) {
+    public RequirementBuilder<T> addAllIf(boolean result, @NonNull Collection<? extends RequirementCase<? super T>> requirementCases) {
 
         checkState();
 
@@ -71,19 +75,7 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
     @NonNull
     @Override
-    public RequirementBuilder fork() {
-
-        checkState();
-
-        final RequirementBuilderImpl builder = new RequirementBuilderImpl();
-        builder.requirementCases.addAll(requirementCases);
-
-        return builder;
-    }
-
-    @NonNull
-    @Override
-    public Requirement build(@NonNull Activity activity, @NonNull EventSource eventSource) {
+    public Requirement build() {
 
         checkState();
 
@@ -91,20 +83,20 @@ class RequirementBuilderImpl extends RequirementBuilder {
 
         try {
             return new RequirementImpl(
-                    activity,
-                    eventSource,
-                    Collections.unmodifiableList(requirementCases)
+                    dispatcher,
+                    source,
+                    Collections.unmodifiableList((List<? extends RequirementCase>) requirementCases)
             );
         } finally {
+            dispatcher = null;
+            source = null;
             requirementCases = null;
         }
     }
 
     private void checkState() {
         if (isBuilt) {
-            throw new IllegalStateException("This RequirementBuilder instance was already built. If you " +
-                    "need to create multiple Requirements sharing some cases, use `fork()` method of this builder " +
-                    "before it was built.");
+            throw new IllegalStateException("This RequirementBuilder instance has already been built.");
         }
     }
 }

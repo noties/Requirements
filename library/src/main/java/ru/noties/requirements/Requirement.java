@@ -5,10 +5,12 @@ import android.support.annotation.Nullable;
 
 /**
  * @see RequirementBuilder
- * @see RequirementBuilder#create()
+ * @see RequirementBuilder#create(EventDispatcher, EventSource)
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
+
+    // todo: update javadoc
 
     /**
      * Listener to be notified about requirement resolution process
@@ -38,6 +40,15 @@ public abstract class Requirement {
      * @param listener {@link Listener} to be notified about resolution progress
      */
     public abstract void validate(@NonNull Listener listener);
+
+    /**
+     * Synchronous method to check if the whole requirement cases chain meets requirement. Simply
+     * returns true or false without triggering requirement resolution
+     *
+     * @return a boolean indicating if this requirement is valid (meets requirement)
+     * @since 1.1.0
+     */
+    public abstract boolean isValid();
 
     /**
      * A method to cancel requirement resolution process. The same as calling {@link #cancel(Payload)}

@@ -1,14 +1,17 @@
 package ru.noties.requirements.sample;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import ru.noties.requirements.BuildUtils;
+import ru.noties.requirements.EventDispatcher;
 import ru.noties.requirements.EventSource;
 import ru.noties.requirements.Payload;
 import ru.noties.requirements.Requirement;
@@ -37,11 +40,12 @@ public class MainActivity extends Activity {
                     @Override
                     public void onRequirementSuccess() {
                         // can proceed now
+                        Log.e("requirements", "success");
                     }
 
                     @Override
                     public void onRequirementFailure(@Nullable Payload payload) {
-                        // cannot
+                        Log.e("requirements", "failure");
                     }
                 });
             }
@@ -62,16 +66,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    @SuppressLint("NewApi")
     private void ensureRequirement() {
 
         if (requirement != null) {
             return;
         }
 
-        requirement = RequirementBuilder.create()
+        requirement = RequirementBuilder.create(EventDispatcher.create(this), eventSource)
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())
-                .build(this, eventSource);
+                .build();
     }
 }

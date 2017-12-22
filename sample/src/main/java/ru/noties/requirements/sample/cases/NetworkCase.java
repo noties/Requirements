@@ -1,5 +1,6 @@
 package ru.noties.requirements.sample.cases;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,12 +9,12 @@ import android.net.NetworkInfo;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 
-import ru.noties.requirements.MutableBool;
+import ru.noties.requirements.Flag;
 import ru.noties.requirements.RequestCode;
 import ru.noties.requirements.RequirementCase;
 import ru.noties.requirements.sample.R;
 
-public class NetworkCase extends RequirementCase {
+public class NetworkCase extends RequirementCase<Activity> {
 
     private static final int REQUEST_CODE = RequestCode.createRequestCode(NetworkCase.class);
 
@@ -28,7 +29,7 @@ public class NetworkCase extends RequirementCase {
         // let's present user with explanation dialog
 
         // helper to keep track of dismissed dialog state
-        final MutableBool bool = new MutableBool();
+        final Flag flag = Flag.create();
 
         new AlertDialogBuilder(activity())
                 .setTitle(R.string.case_network_title)
@@ -37,7 +38,7 @@ public class NetworkCase extends RequirementCase {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        bool.setValue(true);
+                        flag.mark();
 
                         final Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                         startActivityForResult(intent, REQUEST_CODE);
@@ -47,7 +48,7 @@ public class NetworkCase extends RequirementCase {
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if (!bool.value()) {
+                        if (!flag.isSet()) {
                             deliverResult(false);
                         }
                     }

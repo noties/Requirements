@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
     }
 }
 
@@ -14,7 +14,7 @@ allprojects {
         google()
         jcenter()
     }
-    group 'ru.noties'
+    group GROUP
     version VERSION_NAME
 }
 
@@ -35,4 +35,6 @@ ext {
 
     final def supportVersion = '26.1.0'
     SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$supportVersion"
+
+    LISTENERS = 'ru.noties:listeners:1.0.0'
 }

@@ -15,6 +15,7 @@ android {
 
 dependencies {
     api SUPPORT_ANNOTATIONS
+    api LISTENERS
 }
 
 task javadoc(type: Javadoc) {
@@ -30,6 +31,11 @@ task javadoc(type: Javadoc) {
 
 task cleanJavadoc(type: Delete) {
     delete file('../docs')
+}
+
+afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    // still cannot find a way o disable generation of empty R file
 }
 
 if (project.hasProperty('release')) {

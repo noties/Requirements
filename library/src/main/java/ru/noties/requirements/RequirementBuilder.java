@@ -1,6 +1,5 @@
 package ru.noties.requirements;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
@@ -8,21 +7,23 @@ import java.util.Collection;
 /**
  * Builder class to create a {@link Requirement}.
  * <p>
- * Please note that one instance of this builder can be built exactly once. If you need to create
- * multiple {@link Requirement}s that share some information between each other (some common
- * {@link RequirementCase}s please use {@link #fork()} method which will copy current information into a new instance.
+ * Please note that one instance of this builder can be built exactly once.
+ * <p>
+ * Changed in 1.1.0: added type argument
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
-public abstract class RequirementBuilder {
+public abstract class RequirementBuilder<T> {
 
     /**
      * Factory method to obtain an instance of {@link RequirementBuilder}
      *
      * @return new instance of {@link RequirementBuilder}
+     * @see EventDispatcher
+     * @see EventSource
      */
     @NonNull
-    public static RequirementBuilder create() {
-        return new RequirementBuilderImpl();
+    public static <T> RequirementBuilder<T> create(@NonNull EventDispatcher<T> eventDispatcher, @NonNull EventSource eventSource) {
+        return new RequirementBuilderImpl<>(eventDispatcher, eventSource);
     }
 
     /**
@@ -30,9 +31,11 @@ public abstract class RequirementBuilder {
      *
      * @param requirementCase {@link RequirementCase} to add
      * @return this instance for chaining
+     * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder add(@NonNull RequirementCase requirementCase);
+    public abstract RequirementBuilder<T> add(@NonNull RequirementCase<? super T> requirementCase)
+            throws IllegalStateException;
 
     /**
      * Adds a {@link RequirementCase} to this builder only if `result` is true
@@ -40,9 +43,11 @@ public abstract class RequirementBuilder {
      * @param result          boolean to check if {@link RequirementCase} should be added
      * @param requirementCase {@link RequirementCase} to add if `result` is true
      * @return this instance for chaining
+     * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addIf(boolean result, @NonNull RequirementCase requirementCase);
+    public abstract RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? super T> requirementCase)
+            throws IllegalStateException;
 
     /**
      * Adds a collection of {@link RequirementCase} to this builder. Please note that collection must
@@ -50,11 +55,12 @@ public abstract class RequirementBuilder {
      *
      * @param requirementCases collection of {@link RequirementCase} to add
      * @return this instance for chaining
+     * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addAll(
-            @NonNull Collection<? extends RequirementCase> requirementCases
-    );
+    public abstract RequirementBuilder<T> addAll(
+            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
+    ) throws IllegalStateException;
 
     /**
      * Adds a collection of {@link RequirementCase} to this builder. Please note that collection must
@@ -63,26 +69,22 @@ public abstract class RequirementBuilder {
      * @param result           boolean to check if collection of {@link RequirementCase} should be added
      * @param requirementCases collection of {@link RequirementCase} to add if `result` is true
      * @return this instance for chaining
+     * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addAllIf(
+    public abstract RequirementBuilder<T> addAllIf(
             boolean result,
-            @NonNull Collection<? extends RequirementCase> requirementCases
-    );
-
-    /**
-     * @return new instance of this builder with all contents copied.
-     */
-    @NonNull
-    public abstract RequirementBuilder fork();
+            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
+    ) throws IllegalStateException;
 
     /**
      * Please note that if no {@link RequirementCase} were added, then build {@link Requirement}
      * will always be in `success` state
      *
      * @return {@link Requirement}
+     * @throws IllegalStateException if this builder instance had been built already
      * @see EventSource
      */
     @NonNull
-    public abstract Requirement build(@NonNull Activity activity, @NonNull EventSource eventSource);
+    public abstract Requirement build() throws IllegalStateException;
 }
