@@ -89,7 +89,7 @@ public abstract class RequirementCase<T> {
     /**
      * @return target of this requirement case
      * @see EventDispatcher#target()
-     * @see 1.1.0
+     * @since 1.1.0
      */
     @NonNull
     protected T target() {
