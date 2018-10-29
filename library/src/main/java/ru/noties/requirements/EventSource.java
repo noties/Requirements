@@ -11,6 +11,13 @@ import android.support.annotation.NonNull;
  * to this instance by calling {@link #onActivityResult(int, int, Intent)}
  * and {@link #onRequestPermissionsResult(int, String[], int[])}. Both of them return a boolean
  * indicating if event was consumed.
+ * <p>
+ * Please note that due to weird behaviour of Fragments (both system and compat) it\'s recommended
+ * to use {@link EventSource} established in an Activity. This will help to deal with results in
+ * a natural way (no restrictions on `requestCode`, no failures with nested fragments). If this
+ * advice is followed <strong>make sure that {@link EventDispatcher} is also initialized
+ * with Activity</strong>. Otherwise fragment will modify `requestCode` property and final result
+ * won\'t be handled.
  *
  * @see #create()
  */

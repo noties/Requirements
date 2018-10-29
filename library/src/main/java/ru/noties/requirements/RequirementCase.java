@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
  * @see PermissionCase
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class RequirementCase<T> {
+public abstract class RequirementCase {
 
     /**
      * Synchronous method to check if requirement is satisfied
@@ -37,11 +37,11 @@ public abstract class RequirementCase<T> {
     public abstract void startResolution();
 
 
-    private EventDispatcher<T> dispatcher;
+    private EventDispatcher dispatcher;
     private Callback callback;
 
 
-    public final void attach(@NonNull EventDispatcher<T> dispatcher, @NonNull Callback callback) {
+    public final void attach(@NonNull EventDispatcher dispatcher, @NonNull Callback callback) {
         this.dispatcher = dispatcher;
         this.callback = callback;
     }
@@ -86,16 +86,6 @@ public abstract class RequirementCase<T> {
         return dispatcher().activity();
     }
 
-    /**
-     * @return target of this requirement case
-     * @see EventDispatcher#target()
-     * @since 1.1.0
-     */
-    @NonNull
-    protected T target() {
-        return dispatcher().target();
-    }
-
     @NonNull
     private Callback callback() {
         Preconditions.checkNonNull(callback, "This requirement case is not attached: " + getClass().getSimpleName());
@@ -104,7 +94,7 @@ public abstract class RequirementCase<T> {
 
     // @since 1.1.0
     @NonNull
-    private EventDispatcher<T> dispatcher() {
+    private EventDispatcher dispatcher() {
         Preconditions.checkNonNull(dispatcher, "This requirement case is not attached: " + getClass().getSimpleName());
         return dispatcher;
     }

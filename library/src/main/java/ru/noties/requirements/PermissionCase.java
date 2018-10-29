@@ -23,7 +23,7 @@ import android.support.annotation.RequiresApi;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 @RequiresApi(Build.VERSION_CODES.M)
-public abstract class PermissionCase<T> extends RequirementCase<T> {
+public abstract class PermissionCase<T> extends RequirementCase {
 
     private final String permission;
 

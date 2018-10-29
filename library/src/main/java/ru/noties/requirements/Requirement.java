@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
 
-    // todo: update javadoc
-
     /**
      * Listener to be notified about requirement resolution process
      *

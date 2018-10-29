@@ -1,11 +1,11 @@
 buildscript {
-    
+
     repositories {
         jcenter()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
 
@@ -22,19 +22,24 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion '4.3'
+wrapper {
+    gradleVersion '4.10.2'
     distributionType 'all'
 }
 
 ext {
 
-    MIN_SDK = 16
-    TARGET_SDK = 26
-    BUILD_TOOLS = '26.0.3'
+    config = [
+            'min-sdk'        : 16,
+            'target-sdk'     : 28,
+            'build-tools'    : '28.0.3',
+            'gradle-push-aar': 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+    ]
 
-    final def supportVersion = '26.1.0'
-    SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$supportVersion"
-
-    LISTENERS = 'ru.noties:listeners:1.0.0'
+    final def support_version = '28.0.0'
+    deps = [
+            'support-annotations': "com.android.support:support-annotations:$support_version",
+            'support-fragments'  : "com.android.support:support-fragment:$support_version",
+            'listeners'          : 'ru.noties:listeners:1.0.0'
+    ]
 }

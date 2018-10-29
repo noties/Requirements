@@ -11,23 +11,17 @@ import android.support.annotation.RequiresApi;
  * @since 1.1.0
  */
 @SuppressWarnings("WeakerAccess")
-public class EventDispatcherActivity<A extends Activity> extends EventDispatcher<A> {
+public class EventDispatcherActivity extends EventDispatcher {
 
-    private final A activity;
+    private final Activity activity;
 
-    public EventDispatcherActivity(@NonNull A activity) {
+    public EventDispatcherActivity(@NonNull Activity activity) {
         this.activity = activity;
     }
 
     @NonNull
     @Override
     public Activity activity() {
-        return activity;
-    }
-
-    @NonNull
-    @Override
-    public A target() {
         return activity;
     }
 

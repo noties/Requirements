@@ -12,7 +12,7 @@ import java.util.Collection;
  * Changed in 1.1.0: added type argument
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
-public abstract class RequirementBuilder<T> {
+public abstract class RequirementBuilder {
 
     /**
      * Factory method to obtain an instance of {@link RequirementBuilder}
@@ -22,7 +22,7 @@ public abstract class RequirementBuilder<T> {
      * @see EventSource
      */
     @NonNull
-    public static <T> RequirementBuilder<T> create(@NonNull EventDispatcher<T> eventDispatcher, @NonNull EventSource eventSource) {
+    public static RequirementBuilder create(@NonNull EventDispatcher eventDispatcher, @NonNull EventSource eventSource) {
         return new RequirementBuilderImpl<>(eventDispatcher, eventSource);
     }
 
@@ -34,7 +34,7 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> add(@NonNull RequirementCase<? super T> requirementCase)
+    public abstract RequirementBuilder add(@NonNull RequirementCase requirementCase)
             throws IllegalStateException;
 
     /**
@@ -46,7 +46,7 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> addIf(boolean result, @NonNull RequirementCase<? super T> requirementCase)
+    public abstract RequirementBuilder addIf(boolean result, @NonNull RequirementCase requirementCase)
             throws IllegalStateException;
 
     /**
@@ -58,8 +58,8 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> addAll(
-            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
+    public abstract RequirementBuilder addAll(
+            @NonNull Collection<? extends RequirementCase> requirementCases
     ) throws IllegalStateException;
 
     /**
@@ -72,9 +72,9 @@ public abstract class RequirementBuilder<T> {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder<T> addAllIf(
+    public abstract RequirementBuilder addAllIf(
             boolean result,
-            @NonNull Collection<? extends RequirementCase<? super T>> requirementCases
+            @NonNull Collection<? extends RequirementCase> requirementCases
     ) throws IllegalStateException;
 
     /**

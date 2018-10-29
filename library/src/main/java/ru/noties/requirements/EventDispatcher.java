@@ -10,24 +10,79 @@ import android.support.annotation.RequiresApi;
 
 /**
  * Abstraction to allow resolving requirements from any context (not from android.content.Context).
- * Provides 2 factory methods to work with Activity and Fragment.
+ * Provides 3 factory methods to work with Activity and Fragment.
  *
  * @see #create(Activity)
  * @see #create(Fragment)
  * @since 1.1.0
  */
-public abstract class EventDispatcher<T> {
+public abstract class EventDispatcher {
 
     /**
      * Factory method to obtain an instance of EventDispatcher that dispatches events through android.app.Activity
      *
      * @param activity from which to dispatch events
-     * @return an instance of EventDispatcher
+     * @return an instance of {@link EventDispatcher}
      * @see EventDispatcherActivity
+     * @since 2.0.0
      */
     @NonNull
-    public static <A extends Activity> EventDispatcher<A> create(@NonNull A activity) {
-        return new EventDispatcherActivity<>(activity);
+    public static EventDispatcher activity(@NonNull Activity activity) {
+        return new EventDispatcherActivity(activity);
+    }
+
+    /**
+     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.app.Fragment.
+     * <p>
+     * Please note that if you use this dispatcher or create your own, {@link EventSource} should
+     * consume events from a Fragment (and not from Activity).
+     * <p>
+     * Please note that it is advised to use Activity based dispatcher (in association with proper
+     * {@link EventSource}
+     *
+     * @param fragment from which to dispatch events
+     * @return an instance of {@link EventDispatcher}
+     * @see EventDispatcherFragment
+     * @since 2.0.0
+     */
+    @SuppressWarnings("unused")
+    @NonNull
+    public static EventDispatcher fragment(@NonNull Fragment fragment) {
+        return new EventDispatcherFragment(fragment);
+    }
+
+    /**
+     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.support.v4.app.Fragment
+     * <p>
+     * Please note that if you use this dispatcher or create your own, {@link EventSource} should
+     * consume events from a Fragment (and not from Activity).
+     * <p>
+     * Please note that it is advised to use Activity based dispatcher (in association with proper
+     * {@link EventSource}
+     *
+     * @param fragment from which to dispatch events
+     * @return an instance of {@link EventDispatcher}
+     * @see EventDispatcherFragmentCompat
+     * @since 2.0.0
+     */
+    @NonNull
+    public static EventDispatcher fragment(@NonNull android.support.v4.app.Fragment fragment) {
+        return new EventDispatcherFragmentCompat(fragment);
+    }
+
+    /**
+     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.app.Activity
+     *
+     * @param activity from which to dispatch events
+     * @return an instance of {@link EventDispatcher}
+     * @see EventDispatcherActivity
+     * @deprecated 2.0.0 in favor of {@link #activity()} in order to make this more explicit
+     */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @NonNull
+    @Deprecated
+    public static EventDispatcher create(@NonNull Activity activity) {
+        return new EventDispatcherActivity(activity);
     }
 
     /**
@@ -37,12 +92,15 @@ public abstract class EventDispatcher<T> {
      * consume events from a Fragment (and not from Activity)
      *
      * @param fragment from which to dispatch events
-     * @return an instance of EventDispatcher
+     * @return an instance of {@link EventDispatcher}
+     * @see EventDispatcherFragment
+     * @deprecated 2.0.0 in favor of {@link #fragment(Fragment)} in order to make this more explicit
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
     @NonNull
-    public static <F extends android.app.Fragment> EventDispatcher<F> create(@NonNull F fragment) {
-        return new EventDispatcherFragment<>(fragment);
+    @Deprecated
+    public static EventDispatcher create(@NonNull Fragment fragment) {
+        return new EventDispatcherFragment(fragment);
     }
 
     /**
@@ -50,12 +108,6 @@ public abstract class EventDispatcher<T> {
      */
     @NonNull
     public abstract Activity activity();
-
-    /**
-     * @return associated target
-     */
-    @NonNull
-    public abstract T target();
 
 
     public abstract void startActivityForResult(

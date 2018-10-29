@@ -17,6 +17,7 @@ import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
 import static android.os.Build.VERSION_CODES.N_MR1;
 import static android.os.Build.VERSION_CODES.O;
+import static android.os.Build.VERSION_CODES.P;
 
 /**
  * Utility class to check if certain features of Android SDK can be used
@@ -36,17 +37,16 @@ public abstract class BuildUtils {
             M, // 6.0
             N, // 7.0
             N_MR1, // 7.1
-            O // 8.0
+            O, // 8.0,
+            P // 9.0
     })
     @Retention(RetentionPolicy.CLASS)
     @interface SdkVersion {
     }
 
     public static boolean isAtLeast(@SdkVersion int sdkVersion) {
-        return VERSION >= sdkVersion;
+        return Build.VERSION.SDK_INT >= sdkVersion;
     }
-
-    private static final int VERSION = Build.VERSION.SDK_INT;
 
     private BuildUtils() {
     }
