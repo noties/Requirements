@@ -10,10 +10,14 @@ import android.support.annotation.RequiresApi;
 
 /**
  * Abstraction to allow resolving requirements from any context (not from android.content.Context).
- * Provides 3 factory methods to work with Activity and Fragment.
+ * Provides 1 factory method to work with Activity.
+ * <p>
+ * Please note that Fragments are intentionally not included as they require <em>special care</em>.
+ * When using them one <strong>must be absolutely sure to use both dispatcher and source</strong>
+ * that is initialized for a fragment. Otherwise, due to some special requirements that fragments have,
+ * mixing different dispatcher and source will result in ignored events (fragments do modify request code).
  *
- * @see #create(Activity)
- * @see #create(Fragment)
+ * @see #activity()
  * @since 1.1.0
  */
 public abstract class EventDispatcher {
@@ -29,45 +33,6 @@ public abstract class EventDispatcher {
     @NonNull
     public static EventDispatcher activity(@NonNull Activity activity) {
         return new EventDispatcherActivity(activity);
-    }
-
-    /**
-     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.app.Fragment.
-     * <p>
-     * Please note that if you use this dispatcher or create your own, {@link EventSource} should
-     * consume events from a Fragment (and not from Activity).
-     * <p>
-     * Please note that it is advised to use Activity based dispatcher (in association with proper
-     * {@link EventSource}
-     *
-     * @param fragment from which to dispatch events
-     * @return an instance of {@link EventDispatcher}
-     * @see EventDispatcherFragment
-     * @since 2.0.0
-     */
-    @SuppressWarnings("unused")
-    @NonNull
-    public static EventDispatcher fragment(@NonNull Fragment fragment) {
-        return new EventDispatcherFragment(fragment);
-    }
-
-    /**
-     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.support.v4.app.Fragment
-     * <p>
-     * Please note that if you use this dispatcher or create your own, {@link EventSource} should
-     * consume events from a Fragment (and not from Activity).
-     * <p>
-     * Please note that it is advised to use Activity based dispatcher (in association with proper
-     * {@link EventSource}
-     *
-     * @param fragment from which to dispatch events
-     * @return an instance of {@link EventDispatcher}
-     * @see EventDispatcherFragmentCompat
-     * @since 2.0.0
-     */
-    @NonNull
-    public static EventDispatcher fragment(@NonNull android.support.v4.app.Fragment fragment) {
-        return new EventDispatcherFragmentCompat(fragment);
     }
 
     /**
@@ -93,14 +58,15 @@ public abstract class EventDispatcher {
      *
      * @param fragment from which to dispatch events
      * @return an instance of {@link EventDispatcher}
-     * @see EventDispatcherFragment
-     * @deprecated 2.0.0 in favor of {@link #fragment(Fragment)} in order to make this more explicit
+     * @deprecated 2.0.0 (removed support for fragments)
      */
     @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
     @NonNull
     @Deprecated
     public static EventDispatcher create(@NonNull Fragment fragment) {
-        return new EventDispatcherFragment(fragment);
+        throw new RuntimeException("Starting with 2.0.0 there is no fragment support. Please roll " +
+                "your own EventDispatcher and EventSource if you need this functionality in a Fragment " +
+                "(or whatever)");
     }
 
     /**

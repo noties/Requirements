@@ -16,11 +16,8 @@ android {
 dependencies {
 
     deps.with {
-
         api it['support-annotations']
         api it['listeners']
-
-        compileOnly it['support-fragments']
     }
 }
 

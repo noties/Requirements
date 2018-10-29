@@ -40,7 +40,7 @@ public abstract class BuildUtils {
             O, // 8.0,
             P // 9.0
     })
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.RUNTIME)
     @interface SdkVersion {
     }
 

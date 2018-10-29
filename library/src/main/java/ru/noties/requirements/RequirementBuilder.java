@@ -23,7 +23,7 @@ public abstract class RequirementBuilder {
      */
     @NonNull
     public static RequirementBuilder create(@NonNull EventDispatcher eventDispatcher, @NonNull EventSource eventSource) {
-        return new RequirementBuilderImpl<>(eventDispatcher, eventSource);
+        return new RequirementBuilderImpl(eventDispatcher, eventSource);
     }
 
     /**
