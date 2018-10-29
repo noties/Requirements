@@ -1,6 +1,5 @@
 package ru.noties.requirements.sample.cases;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,7 +12,7 @@ import ru.noties.requirements.RequestCode;
 import ru.noties.requirements.RequirementCase;
 import ru.noties.requirements.sample.R;
 
-public class LocationServicesCase extends RequirementCase<Activity> {
+public class LocationServicesCase extends RequirementCase {
 
     private static final int REQUEST_CODE = RequestCode.createRequestCode(LocationServicesCase.class);
 

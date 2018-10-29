@@ -11,7 +11,7 @@ import ru.noties.requirements.PermissionCase;
 import ru.noties.requirements.sample.R;
 
 @RequiresApi(Build.VERSION_CODES.M)
-public class LocationPermissionCase extends PermissionCase<Activity> {
+public class LocationPermissionCase extends PermissionCase {
 
     public LocationPermissionCase() {
         super(Manifest.permission.ACCESS_FINE_LOCATION);
