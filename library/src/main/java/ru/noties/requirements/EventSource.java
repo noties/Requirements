@@ -1,9 +1,9 @@
 package ru.noties.requirements;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 
 /**
  * Helper class to receive `onActivityResult` and `onRequestPermissionsResult` events from activity or
@@ -58,7 +58,7 @@ public abstract class EventSource {
         /**
          * @return a boolean indicating if event was consumed
          */
-        @TargetApi(Build.VERSION_CODES.M)
+        @RequiresApi(Build.VERSION_CODES.M)
         boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
     }
 
@@ -74,7 +74,7 @@ public abstract class EventSource {
      *
      * @return a boolean indicating if event was consumed
      */
-    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     public abstract boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
     /**

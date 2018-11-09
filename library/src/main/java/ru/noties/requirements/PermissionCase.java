@@ -78,7 +78,7 @@ public abstract class PermissionCase extends RequirementCase {
      * user gave his/her agreement
      */
     protected void requestPermission() {
-        activity().requestPermissions(new String[]{permission}, requestCode);
+        requestPermission(permission, requestCode);
     }
 
     /**

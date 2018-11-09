@@ -31,7 +31,7 @@ public abstract class EventDispatcher {
      * @since 2.0.0
      */
     @NonNull
-    public static EventDispatcher activity(@NonNull Activity activity) {
+    public static EventDispatcherActivity activity(@NonNull Activity activity) {
         return new EventDispatcherActivity(activity);
     }
 
@@ -66,7 +66,7 @@ public abstract class EventDispatcher {
     public static EventDispatcher create(@NonNull Fragment fragment) {
         throw new RuntimeException("Starting with 2.0.0 there is no fragment support. Please roll " +
                 "your own EventDispatcher and EventSource if you need this functionality in a Fragment " +
-                "(or whatever)");
+                "(or anything else)");
     }
 
     /**

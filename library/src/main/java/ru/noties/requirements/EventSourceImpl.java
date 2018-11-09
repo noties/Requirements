@@ -1,13 +1,17 @@
 package ru.noties.requirements;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 
-import ru.noties.listeners.Listeners;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 class EventSourceImpl extends EventSource {
 
-    private final Listeners<Listener> listeners = Listeners.create(3);
+    // generally it's a good idea to take _smallest_ interface possible,
+    // but here just let's make it explicit what this collection is for
+    private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
     EventSourceImpl() {
     }
@@ -17,7 +21,7 @@ class EventSourceImpl extends EventSource {
 
         boolean result = false;
 
-        for (Listener listener : listeners.begin()) {
+        for (Listener listener : listeners) {
             result |= listener.onActivityResult(requestCode, resultCode, data);
         }
 
@@ -25,11 +29,12 @@ class EventSourceImpl extends EventSource {
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         boolean result = false;
 
-        for (Listener listener : listeners.begin()) {
+        for (Listener listener : listeners) {
             result |= listener.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 

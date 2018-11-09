@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 
 /**
  * Represents stateless requirement case.
@@ -125,17 +126,17 @@ public abstract class RequirementCase {
         dispatcher().startActivityForResult(intent, requestCode);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     protected void requestPermission(@NonNull String permission, @IntRange(from = 0, to = RequestCode.MAX) int requestCode) {
         dispatcher().requestPermission(permission, requestCode);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     protected boolean checkSelfPermission(@NonNull String permission) {
         return dispatcher().checkSelfPermission(permission);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     protected boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
         return dispatcher().shouldShowRequestPermissionRationale(permission);
     }

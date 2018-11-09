@@ -6,9 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 class RequirementImpl extends Requirement
         implements EventSource.Listener, RequirementCase.Callback {
@@ -209,10 +209,9 @@ class RequirementImpl extends Requirement
 
     private static class ListenerSource implements Listener {
 
-        private final List<Listener> listeners;
+        private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
         ListenerSource() {
-            this.listeners = new ArrayList<>(3);
         }
 
         @Override

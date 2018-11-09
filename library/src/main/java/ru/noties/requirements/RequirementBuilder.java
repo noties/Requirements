@@ -10,6 +10,7 @@ import java.util.Collection;
  * Please note that one instance of this builder can be built exactly once.
  * <p>
  * Changed in 1.1.0: added type argument
+ * Changed in 2.0.0: removed type argument
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public abstract class RequirementBuilder {
@@ -25,6 +26,10 @@ public abstract class RequirementBuilder {
     public static RequirementBuilder create(@NonNull EventDispatcher eventDispatcher, @NonNull EventSource eventSource) {
         return new RequirementBuilderImpl(eventDispatcher, eventSource);
     }
+
+    // maybe add: #create(Activity, EventSource) <- implicitly create ActivityEventDispatcher
+    // and
+
 
     /**
      * Adds a {@link RequirementCase} to this builder

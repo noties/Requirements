@@ -6,18 +6,26 @@ android {
     buildToolsVersion config['build-tools']
 
     defaultConfig {
+
         minSdkVersion config['min-sdk']
         targetSdkVersion config['target-sdk']
         versionCode 1
         versionName version
     }
+
+    testOptions.unitTests.includeAndroidResources = true
 }
 
 dependencies {
 
     deps.with {
         api it['support-annotations']
-        api it['listeners']
+    }
+
+    deps.test.with {
+        testImplementation it['junit']
+        testImplementation it['robolectric']
+        testImplementation it['mockito']
     }
 }
 
