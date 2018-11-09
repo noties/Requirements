@@ -1,33 +1,77 @@
 package ru.noties.requirements;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
  * @see RequirementBuilder
  * @see RequirementBuilder#create(EventDispatcher, EventSource)
+ * @see RequirementBuilder#create(Activity, EventSource)
+ * @see RequirementBuilder#create(EventController)
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
+
+    /**
+     * @see RequirementBuilder#create(EventDispatcher, EventSource)
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(
+            @NonNull EventDispatcher eventDispatcher,
+            @NonNull EventSource eventSource) {
+        return RequirementBuilder.create(eventDispatcher, eventSource);
+    }
+
+    /**
+     * @see RequirementBuilder#create(Activity, EventSource)
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(
+            @NonNull Activity activity,
+            @NonNull EventSource eventSource) {
+        return RequirementBuilder.create(activity, eventSource);
+    }
+
+    /**
+     * @see RequirementBuilder#create(EventController)
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(@NonNull EventController eventController) {
+        return RequirementBuilder.create(eventController);
+    }
 
     /**
      * Listener to be notified about requirement resolution process
      *
      * @see #validate(Listener)
      */
-    public interface Listener {
+    public abstract static class Listener {
 
         /**
          * Indicates that requirement is satisfied
          */
-        void onRequirementSuccess();
+        public void onRequirementSuccess() {
+        }
 
         /**
          * Indicates that requirement resolution was cancelled
          *
          * @param payload {@link Payload} to identify this cancellation event
          */
-        void onRequirementFailure(@Nullable Payload payload);
+        public void onRequirementFailure(@Nullable Payload payload) {
+        }
+
+        /**
+         * Will be called after requirement resolution has finished
+         *
+         * @since 2.0.0
+         */
+        public void onComplete() {
+        }
     }
 
     /**

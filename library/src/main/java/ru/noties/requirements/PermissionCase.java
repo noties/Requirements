@@ -112,6 +112,9 @@ public abstract class PermissionCase extends RequirementCase {
     @Override
     public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (this.requestCode == requestCode) {
+
+            // should we also validate that this is our result by checking permission array?
+            // it must be exactly one item and this item must be our permission
             if (grantResults.length > 0
                     && PackageManager.PERMISSION_GRANTED == grantResults[0]) {
                 deliverResult(true);
@@ -135,7 +138,7 @@ public abstract class PermissionCase extends RequirementCase {
     }
 
     /**
-     * @return automatically generated requestCode
+     * @return `requestCode` that is used by this case
      * @see RequestCode#createRequestCode(String)
      */
     public int requestCode() {

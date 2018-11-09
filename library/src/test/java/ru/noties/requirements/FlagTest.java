@@ -12,7 +12,6 @@ public class FlagTest {
     @Test
     public void test() {
         assertFlag(Flag.create());
-        assertFlag(Flag.synchronizedFlag());
     }
 
     private void assertFlag(@NonNull Flag flag) {

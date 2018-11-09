@@ -8,14 +8,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
 /**
+ * Changed in 2.0.0: made package-private
+ *
  * @since 1.1.0
  */
 @SuppressWarnings("WeakerAccess")
-public class EventDispatcherActivity extends EventDispatcher {
+class EventDispatcherActivity extends EventDispatcher {
 
     private final Activity activity;
 
-    public EventDispatcherActivity(@NonNull Activity activity) {
+    EventDispatcherActivity(@NonNull Activity activity) {
         this.activity = activity;
     }
 

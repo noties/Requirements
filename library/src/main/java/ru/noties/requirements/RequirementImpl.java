@@ -152,6 +152,9 @@ class RequirementImpl extends Requirement
             listenerSource.onRequirementSuccess();
         }
 
+        // @since 2.0.0
+        listenerSource.onComplete();
+
         listenerSource.clear();
     }
 
@@ -207,7 +210,7 @@ class RequirementImpl extends Requirement
         }
     }
 
-    private static class ListenerSource implements Listener {
+    private static class ListenerSource extends Listener {
 
         private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -225,6 +228,13 @@ class RequirementImpl extends Requirement
         public void onRequirementFailure(@Nullable Payload payload) {
             for (Listener listener : listeners) {
                 listener.onRequirementFailure(payload);
+            }
+        }
+
+        @Override
+        public void onComplete() {
+            for (Listener listener : listeners) {
+                listener.onComplete();
             }
         }
 

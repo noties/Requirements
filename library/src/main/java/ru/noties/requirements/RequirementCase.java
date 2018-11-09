@@ -16,6 +16,7 @@ import android.support.annotation.RequiresApi;
  * Library provides a subclass for easier interaction with Android Permissions, see: {@link PermissionCase}
  * <p>
  * Changed in 1.1.0: added type parameter to indicate `target` of this requirement case
+ * Changed in 2.0.0: removed type parameter
  *
  * @see #meetsRequirement()
  * @see #startResolution()
@@ -80,6 +81,13 @@ public abstract class RequirementCase {
     }
 
     /**
+     * Please note that `startActivityForResult` and according permission methods must be
+     * started via defined in this class methods: {@link #startActivityForResult(Intent, int)},
+     * {@link #requestPermission(String, int)}, {@link #checkSelfPermission(String)},
+     * {@link #shouldShowRequestPermissionRationale(String)} as they will properly use
+     * {@link EventDispatcher} that is supplied to this class. Usage of these methods directly on
+     * Activity instance might break things especially if custom {@link EventSource} is used.
+     *
      * @return Activity to which this requirement case currently attached
      */
     @NonNull
@@ -107,7 +115,32 @@ public abstract class RequirementCase {
      * @since 1.0.1
      */
     protected void deliverResult(boolean result) {
-        deliverResult(result, null);
+        callback().onRequirementCaseResult(result, null);
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    protected void deliverSuccess() {
+        callback().onRequirementCaseResult(true, null);
+    }
+
+    /**
+     * The same as {@link #deliverFailure(Payload)} with `null` as payload argument
+     *
+     * @see #deliverFailure(Payload)
+     * @since 2.0.0
+     */
+    protected void deliverFailure() {
+        deliverFailure(null);
+    }
+
+    /**
+     * @param payload {@link Payload} to be delivered as a failure reason
+     * @since 2.0.0
+     */
+    protected void deliverFailure(@Nullable Payload payload) {
+        callback().onRequirementCaseResult(false, payload);
     }
 
     /**
@@ -116,8 +149,10 @@ public abstract class RequirementCase {
      * @param result  true for success, false for failure
      * @param payload {@link Payload} to identify _error_ state. Please note that it will be ignored in case of success result
      * @since 1.0.1
+     * @deprecated 2.0.0 use {@link #deliverFailure(Payload)}
      */
-    @SuppressWarnings("SameParameterValue")
+    @SuppressWarnings({"SameParameterValue", "DeprecatedIsStillUsed"})
+    @Deprecated
     protected void deliverResult(boolean result, @Nullable Payload payload) {
         callback().onRequirementCaseResult(result, payload);
     }

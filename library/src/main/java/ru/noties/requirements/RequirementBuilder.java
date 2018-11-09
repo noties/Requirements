@@ -1,5 +1,6 @@
 package ru.noties.requirements;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.Collection;
@@ -27,9 +28,27 @@ public abstract class RequirementBuilder {
         return new RequirementBuilderImpl(eventDispatcher, eventSource);
     }
 
-    // maybe add: #create(Activity, EventSource) <- implicitly create ActivityEventDispatcher
-    // and
+    /**
+     * Factory method to create an instance of {@link RequirementBuilder}. Will implicitly
+     * create {@link EventDispatcher} by calling {@link EventDispatcher#activity()}
+     *
+     * @param activity Activity through which to dispatch events
+     * @param source   {@link EventSource}
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder create(@NonNull Activity activity, @NonNull EventSource source) {
+        return new RequirementBuilderImpl(EventDispatcher.activity(activity), source);
+    }
 
+    /**
+     * @param eventController {@link EventController}
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder create(@NonNull EventController eventController) {
+        return new RequirementBuilderImpl(eventController.eventDispatcher(), eventController.eventSource());
+    }
 
     /**
      * Adds a {@link RequirementCase} to this builder

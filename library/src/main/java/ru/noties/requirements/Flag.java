@@ -10,14 +10,12 @@ import android.support.annotation.NonNull;
  * Changed in 1.1.0 (previously `MutableBool`)
  *
  * @see #create()
- * @see #synchronizedFlag()
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Flag {
 
     /**
-     * Factory method to create {@link Flag}. Not thread safe. If you need synchronized {@link Flag}
-     * you can use {@link #synchronizedFlag()}
+     * Factory method to create {@link Flag}
      *
      * @return an instance of Flag
      * @since 1.1.0
@@ -25,15 +23,6 @@ public class Flag {
     @NonNull
     public static Flag create() {
         return new Flag();
-    }
-
-    /**
-     * @return an instance of Flag that synchronizes access to internal flag variable
-     * @since 1.1.0
-     */
-    @NonNull
-    public static Flag synchronizedFlag() {
-        return new SyncFlag();
     }
 
     private boolean value;
@@ -64,23 +53,5 @@ public class Flag {
         return "Flag{" +
                 "value=" + value +
                 '}';
-    }
-
-    private static class SyncFlag extends Flag {
-
-        @Override
-        public synchronized void mark() {
-            super.mark();
-        }
-
-        @Override
-        public synchronized boolean isSet() {
-            return super.isSet();
-        }
-
-        @Override
-        public synchronized String toString() {
-            return super.toString();
-        }
     }
 }

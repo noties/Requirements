@@ -1,7 +1,6 @@
 package ru.noties.requirements;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.IntRange;
@@ -17,7 +16,7 @@ import android.support.annotation.RequiresApi;
  * that is initialized for a fragment. Otherwise, due to some special requirements that fragments have,
  * mixing different dispatcher and source will result in ignored events (fragments do modify request code).
  *
- * @see #activity()
+ * @see #activity(Activity)
  * @since 1.1.0
  */
 public abstract class EventDispatcher {
@@ -41,32 +40,13 @@ public abstract class EventDispatcher {
      * @param activity from which to dispatch events
      * @return an instance of {@link EventDispatcher}
      * @see EventDispatcherActivity
-     * @deprecated 2.0.0 in favor of {@link #activity()} in order to make this more explicit
+     * @deprecated 2.0.0 in favor of {@link #activity(Activity)} in order to make this more explicit
      */
     @SuppressWarnings("DeprecatedIsStillUsed")
     @NonNull
     @Deprecated
     public static EventDispatcher create(@NonNull Activity activity) {
         return new EventDispatcherActivity(activity);
-    }
-
-    /**
-     * Factory method to obtain an instance of EventDispatcher that dispatches events through android.app.Fragment.
-     * <p>
-     * Please note that if you use this dispatcher or create your own, {@link EventSource} should
-     * consume events from a Fragment (and not from Activity)
-     *
-     * @param fragment from which to dispatch events
-     * @return an instance of {@link EventDispatcher}
-     * @deprecated 2.0.0 (removed support for fragments)
-     */
-    @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
-    @NonNull
-    @Deprecated
-    public static EventDispatcher create(@NonNull Fragment fragment) {
-        throw new RuntimeException("Starting with 2.0.0 there is no fragment support. Please roll " +
-                "your own EventDispatcher and EventSource if you need this functionality in a Fragment " +
-                "(or anything else)");
     }
 
     /**
