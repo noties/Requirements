@@ -15,5 +15,11 @@ android {
 }
 
 dependencies {
+
     implementation project(':library')
+    implementation 'ru.noties:debug:4.0.0@jar'
+
+    deps.with {
+        implementation it['support-fragments']
+    }
 }

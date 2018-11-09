@@ -20,6 +20,7 @@ dependencies {
 
     deps.with {
         api it['support-annotations']
+        compileOnly it['support-fragments']
     }
 
     deps.test.with {

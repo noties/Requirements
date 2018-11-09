@@ -1,44 +1,41 @@
 package ru.noties.requirements.sample;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 import ru.noties.debug.Debug;
 import ru.noties.requirements.BuildUtils;
-import ru.noties.requirements.EventSource;
 import ru.noties.requirements.Payload;
 import ru.noties.requirements.Requirement;
 import ru.noties.requirements.RequirementBuilder;
+import ru.noties.requirements.fragment.FragmentEventController;
 import ru.noties.requirements.sample.cases.LocationPermissionCase;
 import ru.noties.requirements.sample.cases.LocationServicesCase;
 import ru.noties.requirements.sample.cases.NetworkCase;
 
-public class MainActivity extends Activity {
+public class MainActivityFragment extends FragmentActivity {
 
-    private final EventSource eventSource = EventSource.create();
-
-    private final Requirement requirement = createRequirement();
+    private Requirement requirement;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        requirement = createRequirement();
 
         final View view = findViewById(R.id.button);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(final View v) {
+            public void onClick(View v) {
                 requirement.validate(new Requirement.Listener() {
                     @Override
                     public void onRequirementSuccess() {
-                        // can proceed now
                         Debug.i();
                     }
 
@@ -51,25 +48,10 @@ public class MainActivity extends Activity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!eventSource.onActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (!eventSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     @SuppressLint("NewApi")
     @NonNull
     private Requirement createRequirement() {
-        return RequirementBuilder.create(this, eventSource)
+        return RequirementBuilder.create(FragmentEventController.get(this))
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())

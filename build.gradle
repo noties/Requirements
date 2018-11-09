@@ -38,7 +38,8 @@ ext {
 
     final def support_version = '28.0.0'
     deps = [
-            'support-annotations': "com.android.support:support-annotations:$support_version"
+            'support-annotations': "com.android.support:support-annotations:$support_version",
+            'support-fragments'  : "com.android.support:support-fragment:$support_version"
     ]
 
     deps['test'] = [
