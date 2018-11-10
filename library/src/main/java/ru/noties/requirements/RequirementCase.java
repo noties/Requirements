@@ -54,6 +54,13 @@ public abstract class RequirementCase {
     }
 
     /**
+     * @since 2.0.0
+     */
+    public final boolean isAttached() {
+        return dispatcher != null && callback != null;
+    }
+
+    /**
      * Please override this method if your {@link RequirementCase} need to receive `onActivityResult` event
      *
      * @return boolean indicating if this event was consumed

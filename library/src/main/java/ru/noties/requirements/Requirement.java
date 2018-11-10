@@ -118,4 +118,21 @@ public abstract class Requirement {
      * @since 1.0.1
      */
     public abstract boolean isInProgress();
+
+    /**
+     * Destroys this {@link Requirement}. Please note this is done automatically
+     * when Activity goes through `#onDestroy` automatically
+     *
+     * @see #isDestroyed()
+     * @since 2.0.0
+     */
+    public abstract void destroy();
+
+    /**
+     * @return flag indicating if this {@link Requirement} is destroyed (after Activity natural
+     * `#onDetsroy` lifecycle event or via manual call to {@link #destroy()}
+     * @see #destroy()
+     * @since 2.0.0
+     */
+    public abstract boolean isDestroyed();
 }

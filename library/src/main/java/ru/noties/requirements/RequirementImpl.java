@@ -27,6 +27,11 @@ class RequirementImpl extends Requirement
 
     private EventSource.Subscription subscription;
 
+    // @since 2.0.0
+    private boolean isDestroyed;
+
+    private ActivityDestroyedListener activityDestroyedListener;
+
     RequirementImpl(
             @NonNull EventDispatcher eventDispatcher,
             @NonNull EventSource eventSource,
@@ -41,11 +46,15 @@ class RequirementImpl extends Requirement
         // register listener to be notified about activity destroyed event
         // so we can release everything
         this.activity = eventDispatcher.activity();
-        this.activity.getApplication().registerActivityLifecycleCallbacks(new ActivityDestroyedListener());
+        this.activityDestroyedListener = new ActivityDestroyedListener();
+        this.activity.getApplication().registerActivityLifecycleCallbacks(activityDestroyedListener);
     }
 
     @Override
     public void validate(@NonNull Listener listener) {
+
+        // @since 2.0.0
+        checkState();
 
         listenerSource.add(listener);
 
@@ -65,6 +74,10 @@ class RequirementImpl extends Requirement
 
     @Override
     public boolean isValid() {
+
+        // @since 2.0.0
+        checkState();
+
         boolean result = true;
         for (RequirementCase requirementCase : requirementCases) {
             //noinspection unchecked
@@ -80,11 +93,18 @@ class RequirementImpl extends Requirement
 
     @Override
     public void cancel() {
+
+        // @since 2.0.0
+        checkState();
+
         cancel(null);
     }
 
     @Override
     public void cancel(@Nullable Payload payload) {
+
+        // @since 2.0.0
+        checkState();
 
         final RequirementCase current = currentCase();
         if (current != null) {
@@ -101,6 +121,44 @@ class RequirementImpl extends Requirement
         return subscription != null;
     }
 
+    @Override
+    public void destroy() {
+
+        // if we are already destroyed -> silently ignore
+        if (isDestroyed()) {
+            return;
+        }
+
+        isDestroyed = true;
+
+        activity.getApplication().unregisterActivityLifecycleCallbacks(activityDestroyedListener);
+
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+
+        final RequirementCase requirementCase = currentCase();
+        if (requirementCase != null) {
+            requirementCase.detach();
+        }
+
+        deque.clear();
+
+        listenerSource.clear();
+
+        eventDispatcher = null;
+        activity = null;
+        activityDestroyedListener = null;
+        eventSource = null;
+        requirementCases = null;
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+
     @Nullable
     private RequirementCase currentCase() {
         return deque.peek();
@@ -108,17 +166,29 @@ class RequirementImpl extends Requirement
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        // @since 2.0.0
+        checkState();
+
         final RequirementCase requirementCase = currentCase();
         return requirementCase != null && requirementCase.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        // @since 2.0.0
+        checkState();
+
         final RequirementCase requirementCase = currentCase();
         return requirementCase != null && requirementCase.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void validate() {
+
+        // @since 2.0.0
+        checkState();
+
         final RequirementCase current = currentCase();
         if (current != null) {
             //noinspection unchecked
@@ -141,6 +211,9 @@ class RequirementImpl extends Requirement
 
     private void end(boolean success) {
 
+        // @since 2.0.0
+        checkState();
+
         deque.clear();
 
         if (subscription != null) {
@@ -160,6 +233,9 @@ class RequirementImpl extends Requirement
 
     @Override
     public void onRequirementCaseResult(boolean result, @Nullable Payload payload) {
+
+        // @since 2.0.0
+        checkState();
 
         final RequirementCase current = currentCase();
 
@@ -182,30 +258,11 @@ class RequirementImpl extends Requirement
     }
 
     private class ActivityDestroyedListener extends ActivityLifecycleCallbacksAdapter {
+
         @Override
         public void onActivityDestroyed(Activity a) {
             if (activity == a) {
-
-                a.getApplication().unregisterActivityLifecycleCallbacks(this);
-
-                if (subscription != null) {
-                    subscription.unsubscribe();
-                    subscription = null;
-                }
-
-                final RequirementCase requirementCase = currentCase();
-                if (requirementCase != null) {
-                    requirementCase.detach();
-                }
-
-                deque.clear();
-
-                listenerSource.clear();
-
-                eventDispatcher = null;
-                activity = null;
-                eventSource = null;
-                requirementCases = null;
+                destroy();
             }
         }
     }
@@ -244,6 +301,13 @@ class RequirementImpl extends Requirement
 
         void clear() {
             listeners.clear();
+        }
+    }
+
+    private void checkState() {
+        if (isDestroyed) {
+            throw new IllegalStateException("This Requirement instance has been destroyed via " +
+                    "natural Activity `#onDestroy` lifecycle event or via manual call to `Requirement#destroy`.");
         }
     }
 }

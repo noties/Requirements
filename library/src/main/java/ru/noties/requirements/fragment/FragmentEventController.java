@@ -7,6 +7,12 @@ import android.support.v4.app.FragmentManager;
 import ru.noties.requirements.EventController;
 
 /**
+ * An {@link EventController} that uses invisible fragment to dispatch and receive events.
+ * Please note that fragment is not retained and will be recreated after configuration change
+ * or a process death. This is intentional. As one should evaluate the whole chain of
+ * {@link ru.noties.requirements.RequirementCase}s on such occasion.
+ *
+ * @see #get(FragmentActivity)
  * @since 2.0.0
  */
 public abstract class FragmentEventController {

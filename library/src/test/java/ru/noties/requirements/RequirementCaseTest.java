@@ -158,10 +158,13 @@ public class RequirementCaseTest {
         verify(dispatcher, times(1)).checkSelfPermission(anyString());
         verify(dispatcher, times(1)).shouldShowRequestPermissionRationale(anyString());
 
-        // 2 -> callback
+        // 5 -> callback
         requirementCase.deliverResult(true);
+        requirementCase.deliverSuccess();
+        requirementCase.deliverFailure();
+        requirementCase.deliverFailure(null);
         requirementCase.deliverResult(true, null);
 
-        verify(callback, times(2)).onRequirementCaseResult(anyBoolean(), (Payload) any());
+        verify(callback, times(5)).onRequirementCaseResult(anyBoolean(), (Payload) any());
     }
 }
