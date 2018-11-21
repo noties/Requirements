@@ -156,7 +156,7 @@ public abstract class RequirementCase {
      * @param result  true for success, false for failure
      * @param payload {@link Payload} to identify _error_ state. Please note that it will be ignored in case of success result
      * @since 1.0.1
-     * @deprecated 2.0.0 use {@link #deliverFailure(Payload)}
+     * @deprecated 2.0.0 use {@link #deliverSuccess()}, {@link #deliverFailure()} or {@link #deliverFailure(Payload)}
      */
     @SuppressWarnings({"SameParameterValue", "DeprecatedIsStillUsed"})
     @Deprecated

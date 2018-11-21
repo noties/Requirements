@@ -13,7 +13,7 @@ import ru.noties.requirements.EventController;
 import ru.noties.requirements.EventDispatcher;
 import ru.noties.requirements.EventSource;
 
-// note that this Fragment is not retained
+// note that this Fragment is not retained - it is intended
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class EventControllerFragment extends Fragment implements EventController {
 

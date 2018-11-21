@@ -3,6 +3,7 @@ package ru.noties.requirements;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,11 +12,17 @@ import org.mockito.ArgumentCaptor;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -144,31 +151,186 @@ public class RequirementImplTest {
     }
 
     @Test
-    public void single_case() {
-        throw null;
-    }
-
-    @Test
-    public void multiple_cases() {
-        throw null;
-    }
-
-    @Test
     public void is_valid_attach_detaches_no_subscription() {
+
         // only one case will be attached at a time
         // each one will go through attach/detach
         // no event source subscription will be triggered
+
+        final List<RequirementCase> cases = new ArrayList<>();
+        final AtomicInteger count = new AtomicInteger();
+
+        final class Case extends RequirementCase {
+
+            @Override
+            public boolean meetsRequirement() {
+
+                count.incrementAndGet();
+
+                // we must be attached
+                assertTrue(isAttached());
+
+                // all other _must_ be detached
+                for (RequirementCase requirementCase : cases) {
+                    if (requirementCase != this) {
+                        assertFalse(requirementCase.isAttached());
+                    }
+                }
+
+                return true;
+            }
+
+            @Override
+            public void startResolution() {
+                throw new RuntimeException();
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            cases.add(new Case());
+        }
+
+        final EventSource source = mock(EventSource.class);
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                source,
+                cases);
+
+        assertTrue(impl.isValid());
+        assertEquals(10, count.get());
+
+        verify(source, times(0)).subscribe(any(EventSource.Listener.class));
+    }
+
+    @Test
+    public void is_valid_first_false_breaks() {
+
         // first false breaks (no cases will be queried after first failure)
-        throw null;
+        final AtomicInteger count = new AtomicInteger();
+
+        final class Case extends RequirementCase {
+
+            private final boolean meets;
+
+            private Case(boolean meets) {
+                this.meets = meets;
+            }
+
+            @Override
+            public boolean meetsRequirement() {
+                count.incrementAndGet();
+                return meets;
+            }
+
+            @Override
+            public void startResolution() {
+                throw new RuntimeException();
+            }
+        }
+
+        final List<RequirementCase> cases = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            cases.add(new Case(i < 5));
+        }
+
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                mock(EventSource.class),
+                cases);
+
+        assertFalse(impl.isValid());
+        assertEquals(6, count.get()); // first false increments
     }
 
     @Test
     public void cancel_detaches_notifies_failure_unsubscribes() {
-        throw null;
+        assertCancel(new Cancel() {
+            @Override
+            public void doCancel(@NonNull RequirementImpl impl) {
+                impl.cancel();
+            }
+        });
+    }
+
+    @Test
+    public void cancel_payload_detaches_notifies_failure_unsubscribes() {
+        assertCancel(new Cancel() {
+            @Override
+            public void doCancel(@NonNull RequirementImpl impl) {
+                impl.cancel(null);
+            }
+        });
+    }
+
+    private interface Cancel {
+        void doCancel(@NonNull RequirementImpl impl);
+    }
+
+    private void assertCancel(@NonNull Cancel cancel) {
+
+        final class SubscriptionImpl implements EventSource.Subscription {
+
+            private boolean isUnsubscribed;
+
+            @Override
+            public void unsubscribe() {
+                isUnsubscribed = true;
+            }
+        }
+        final SubscriptionImpl subscription = new SubscriptionImpl();
+
+        final EventSource source = mock(EventSource.class);
+        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(subscription);
+
+        final List<RequirementCase> cases = Arrays.asList(mock(RequirementCase.class), mock(RequirementCase.class));
+
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                source,
+                cases);
+
+        final Requirement.Listener listener = mock(Requirement.Listener.class);
+
+        impl.validate(listener);
+
+        assertTrue(impl.isInProgress());
+        assertFalse(subscription.isUnsubscribed);
+
+        verify(source, times(1)).subscribe(any(EventSource.Listener.class));
+
+        cancel.doCancel(impl);
+
+        assertFalse(impl.isInProgress());
+        assertTrue(subscription.isUnsubscribed);
+
+        for (RequirementCase requirementCase : cases) {
+            assertFalse(requirementCase.isAttached());
+        }
+
+        verify(listener, times(1)).onRequirementFailure((Payload) any());
+        verify(listener, times(1)).onComplete();
     }
 
     @Test
     public void activity_destroyed_detach_unsubscribe_cleanup() {
+        assertDestroy(new Destroy() {
+            @Override
+            public void doDestroy(@NonNull Activity activity, @NonNull RequirementImpl impl, @NonNull Application.ActivityLifecycleCallbacks callbacks) {
+                callbacks.onActivityDestroyed(activity);
+            }
+        });
+    }
+
+    @Test
+    public void manual_destroy_detach_unsubscribe_cleanup() {
+        assertDestroy(new Destroy() {
+            @Override
+            public void doDestroy(@NonNull Activity activity, @NonNull RequirementImpl impl, @NonNull Application.ActivityLifecycleCallbacks callbacks) {
+                impl.destroy();
+            }
+        });
+    }
+
+    private static void assertDestroy(@NonNull Destroy destroy) {
 
         final class SubscriptionImpl implements EventSource.Subscription {
 
@@ -213,7 +375,7 @@ public class RequirementImplTest {
 
         // must be activity which dispatcher returns
         final Application.ActivityLifecycleCallbacks callbacks = captor.getValue();
-        callbacks.onActivityDestroyed(activity);
+        destroy.doDestroy(activity, impl, callbacks);
 
         verify(application, times(1)).unregisterActivityLifecycleCallbacks(captor.capture());
         assertSame(callbacks, captor.getValue());
@@ -223,16 +385,150 @@ public class RequirementImplTest {
         assertTrue(subscription.isUnsubscribed);
         assertTrue(impl.isDestroyed());
 
+        // these methods won't throw
+        impl.cancel();
+        impl.cancel(null);
+        impl.isInProgress();
+        impl.destroy();
+
         // now, all methods will throw
+        final Runnable[] runnables = {
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        impl.validate(mock(Requirement.Listener.class));
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        impl.isValid();
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        impl.onActivityResult(0, 0, null);
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        impl.onRequestPermissionsResult(0, null, null);
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        impl.onRequirementCaseResult(true, null);
+                    }
+                }
+        };
+
+        final String message = "This Requirement instance has been destroyed";
+        for (Runnable runnable : runnables) {
+            try {
+                runnable.run();
+                fail();
+            } catch (IllegalStateException e) {
+                assertTrue(e.getMessage(), e.getMessage().startsWith(message));
+            }
+        }
     }
 
     @Test
     public void on_requirement_result_when_no_pending_throws() {
-        throw null;
+
+        final RequirementCase requirementCase = mock(RequirementCase.class);
+
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                mock(EventSource.class),
+                Collections.singletonList(requirementCase));
+
+        assertFalse(impl.isInProgress());
+        assertFalse(requirementCase.isAttached());
+
+        try {
+            impl.onRequirementCaseResult(false, null);
+            fail();
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage(), e.getMessage()
+                    .contains("Unexpected state inside Requirement. RequirementCase delivered a result "));
+        }
     }
 
     @Test
-    public void on_requirement_result_success_next() {
-        throw null;
+    public void cancel_payload_delivered() {
+
+        final RequirementCase requirementCase = mock(RequirementCase.class);
+        final EventSource source = mock(EventSource.class);
+        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(mock(EventSource.Subscription.class));
+
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                source,
+                Collections.singletonList(requirementCase));
+
+        final Requirement.Listener listener = mock(Requirement.Listener.class);
+
+        impl.validate(listener);
+
+        assertTrue(impl.isInProgress());
+        assertTrue(requirementCase.isAttached());
+
+        final Payload payload = mock(Payload.class);
+
+        impl.cancel(payload);
+
+        assertFalse(impl.isInProgress());
+        assertFalse(requirementCase.isAttached());
+
+        final ArgumentCaptor<Payload> captor = ArgumentCaptor.forClass(Payload.class);
+
+        verify(listener, times(1)).onRequirementFailure(captor.capture());
+
+        assertSame(payload, captor.getValue());
+    }
+
+    @Test
+    public void case_payload_delivered() {
+
+        final class MyPayload implements Payload {
+        }
+        final MyPayload myPayload = new MyPayload();
+
+        final RequirementCase requirementCase = new RequirementCase() {
+            @Override
+            public boolean meetsRequirement() {
+                return false;
+            }
+
+            @Override
+            public void startResolution() {
+                // no op
+            }
+        };
+
+        final RequirementImpl impl = new RequirementImpl(
+                mockDispatcher,
+                mock(EventSource.class),
+                Collections.singletonList(requirementCase));
+
+        final Requirement.Listener listener = mock(Requirement.Listener.class);
+        final ArgumentCaptor<Payload> captor = ArgumentCaptor.forClass(Payload.class);
+
+        impl.validate(listener);
+
+        requirementCase.deliverFailure(myPayload);
+
+        verify(listener, times(1)).onRequirementFailure(captor.capture());
+        verify(listener, times(1)).onComplete();
+
+        assertSame(myPayload, captor.getValue());
+    }
+
+    private interface Destroy {
+        void doDestroy(@NonNull Activity activity, @NonNull RequirementImpl impl, @NonNull Application.ActivityLifecycleCallbacks callbacks);
     }
 }

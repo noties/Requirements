@@ -30,6 +30,7 @@ class RequirementImpl extends Requirement
     // @since 2.0.0
     private boolean isDestroyed;
 
+    // @since 2.0.0 made field to allow manual #destroy
     private ActivityDestroyedListener activityDestroyedListener;
 
     RequirementImpl(
@@ -94,8 +95,11 @@ class RequirementImpl extends Requirement
     @Override
     public void cancel() {
 
+        // no need to throw if we are destroyed at this point
         // @since 2.0.0
-        checkState();
+        if (isDestroyed()) {
+            return;
+        }
 
         cancel(null);
     }
@@ -103,8 +107,11 @@ class RequirementImpl extends Requirement
     @Override
     public void cancel(@Nullable Payload payload) {
 
+        // no need to throw if we are destroyed at this point
         // @since 2.0.0
-        checkState();
+        if (isDestroyed()) {
+            return;
+        }
 
         final RequirementCase current = currentCase();
         if (current != null) {
@@ -118,6 +125,7 @@ class RequirementImpl extends Requirement
 
     @Override
     public boolean isInProgress() {
+        // no check for state here
         return subscription != null;
     }
 
