@@ -1,9 +1,11 @@
 package ru.noties.requirements;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Builder class to create a {@link Requirement}.
@@ -13,41 +15,20 @@ import java.util.Collection;
  * Changed in 1.1.0: added type argument
  * Changed in 2.0.0: removed type argument
  */
-@SuppressWarnings({"UnusedReturnValue", "unused"})
-public abstract class RequirementBuilder {
+public class RequirementBuilder {
 
-    /**
-     * Factory method to obtain an instance of {@link RequirementBuilder}
-     *
-     * @return new instance of {@link RequirementBuilder}
-     * @see EventDispatcher
-     * @see EventSource
-     */
-    @NonNull
-    public static RequirementBuilder create(@NonNull EventDispatcher eventDispatcher, @NonNull EventSource eventSource) {
-        return new RequirementBuilderImpl(eventDispatcher, eventSource);
-    }
+    private EventDispatcher dispatcher;
+    private EventSource source;
+    private List<RequirementCase> requirementCases;
 
-    /**
-     * Factory method to create an instance of {@link RequirementBuilder}. Will implicitly
-     * create {@link EventDispatcher} by calling {@link EventDispatcher#activity()}
-     *
-     * @param activity Activity through which to dispatch events
-     * @param source   {@link EventSource}
-     * @since 2.0.0
-     */
-    @NonNull
-    public static RequirementBuilder create(@NonNull Activity activity, @NonNull EventSource source) {
-        return new RequirementBuilderImpl(EventDispatcher.activity(activity), source);
-    }
+    private boolean isBuilt;
 
-    /**
-     * @param eventController {@link EventController}
-     * @since 2.0.0
-     */
-    @NonNull
-    public static RequirementBuilder create(@NonNull EventController eventController) {
-        return new RequirementBuilderImpl(eventController.eventDispatcher(), eventController.eventSource());
+    public RequirementBuilder(
+            @NonNull EventDispatcher dispatcher,
+            @NonNull EventSource source) {
+        this.dispatcher = dispatcher;
+        this.source = source;
+        this.requirementCases = new ArrayList<>(3);
     }
 
     /**
@@ -58,8 +39,14 @@ public abstract class RequirementBuilder {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder add(@NonNull RequirementCase requirementCase)
-            throws IllegalStateException;
+    public RequirementBuilder add(@NonNull RequirementCase requirementCase) {
+
+        checkState();
+
+        requirementCases.add(requirementCase);
+
+        return this;
+    }
 
     /**
      * Adds a {@link RequirementCase} to this builder only if `result` is true
@@ -70,8 +57,18 @@ public abstract class RequirementBuilder {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addIf(boolean result, @NonNull RequirementCase requirementCase)
-            throws IllegalStateException;
+    public RequirementBuilder addIf(
+            boolean result,
+            @NonNull RequirementCase requirementCase) {
+
+        checkState();
+
+        if (result) {
+            add(requirementCase);
+        }
+
+        return this;
+    }
 
     /**
      * Adds a collection of {@link RequirementCase} to this builder. Please note that collection must
@@ -82,9 +79,17 @@ public abstract class RequirementBuilder {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addAll(
-            @NonNull Collection<? extends RequirementCase> requirementCases
-    ) throws IllegalStateException;
+    public RequirementBuilder addAll(@NonNull Collection<? extends RequirementCase> requirementCases) {
+
+        checkState();
+
+        for (RequirementCase requirementCase : requirementCases) {
+            Preconditions.checkNonNull(requirementCase, "Cannot add null RequirementCase");
+            add(requirementCase);
+        }
+
+        return this;
+    }
 
     /**
      * Adds a collection of {@link RequirementCase} to this builder. Please note that collection must
@@ -96,10 +101,18 @@ public abstract class RequirementBuilder {
      * @throws IllegalStateException if this builder instance had been built already
      */
     @NonNull
-    public abstract RequirementBuilder addAllIf(
+    public RequirementBuilder addAllIf(
             boolean result,
-            @NonNull Collection<? extends RequirementCase> requirementCases
-    ) throws IllegalStateException;
+            @NonNull Collection<? extends RequirementCase> requirementCases) {
+
+        checkState();
+
+        if (result) {
+            addAll(requirementCases);
+        }
+
+        return this;
+    }
 
     /**
      * Please note that if no {@link RequirementCase} were added, then build {@link Requirement}
@@ -110,5 +123,28 @@ public abstract class RequirementBuilder {
      * @see EventSource
      */
     @NonNull
-    public abstract Requirement build() throws IllegalStateException;
+    public Requirement build() {
+
+        checkState();
+
+        isBuilt = true;
+
+        try {
+            return new RequirementImpl(
+                    dispatcher,
+                    source,
+                    Collections.unmodifiableList(requirementCases)
+            );
+        } finally {
+            dispatcher = null;
+            source = null;
+            requirementCases = null;
+        }
+    }
+
+    private void checkState() {
+        if (isBuilt) {
+            throw new IllegalStateException("This RequirementBuilder instance has already been built.");
+        }
+    }
 }

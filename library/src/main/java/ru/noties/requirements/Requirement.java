@@ -3,45 +3,67 @@ package ru.noties.requirements;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
-/**
- * @see RequirementBuilder
- * @see RequirementBuilder#create(EventDispatcher, EventSource)
- * @see RequirementBuilder#create(Activity, EventSource)
- * @see RequirementBuilder#create(EventController)
- */
+import ru.noties.requirements.fragment.FragmentEventController;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Requirement {
 
     /**
-     * @see RequirementBuilder#create(EventDispatcher, EventSource)
      * @since 2.0.0
      */
     @NonNull
     public static RequirementBuilder builder(
             @NonNull EventDispatcher eventDispatcher,
             @NonNull EventSource eventSource) {
-        return RequirementBuilder.create(eventDispatcher, eventSource);
+        return new RequirementBuilder(eventDispatcher, eventSource);
     }
 
     /**
-     * @see RequirementBuilder#create(Activity, EventSource)
      * @since 2.0.0
      */
     @NonNull
     public static RequirementBuilder builder(
             @NonNull Activity activity,
             @NonNull EventSource eventSource) {
-        return RequirementBuilder.create(activity, eventSource);
+        return new RequirementBuilder(EventDispatcher.activity(activity), eventSource);
     }
 
     /**
-     * @see RequirementBuilder#create(EventController)
      * @since 2.0.0
      */
     @NonNull
     public static RequirementBuilder builder(@NonNull EventController eventController) {
-        return RequirementBuilder.create(eventController);
+        return new RequirementBuilder(eventController.eventDispatcher(), eventController.eventSource());
+    }
+
+    /**
+     * @see FragmentEventController
+     * @see #builder(EventController)
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(@NonNull FragmentActivity fragmentActivity) {
+        return builder(FragmentEventController.create(fragmentActivity));
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(@NonNull Fragment fragment) {
+        return builder(FragmentEventController.create(fragment));
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    @NonNull
+    public static RequirementBuilder builder(@NonNull FragmentManager manager) {
+        return builder(FragmentEventController.create(manager));
     }
 
     /**
@@ -49,28 +71,46 @@ public abstract class Requirement {
      *
      * @see #validate(Listener)
      */
-    public abstract static class Listener {
+    public interface Listener {
 
         /**
          * Indicates that requirement is satisfied
          */
-        public void onRequirementSuccess() {
-        }
+        void onRequirementSuccess();
 
         /**
          * Indicates that requirement resolution was cancelled
          *
          * @param payload {@link Payload} to identify this cancellation event
          */
-        public void onRequirementFailure(@Nullable Payload payload) {
-        }
+        void onRequirementFailure(@Nullable Payload payload);
 
         /**
          * Will be called after requirement resolution has finished
          *
          * @since 2.0.0
          */
+        void onComplete();
+    }
+
+    /**
+     * @since 2.0.0
+     */
+    public static abstract class ListenerAdapter implements Listener {
+
+        @Override
+        public void onRequirementSuccess() {
+
+        }
+
+        @Override
+        public void onRequirementFailure(@Nullable Payload payload) {
+
+        }
+
+        @Override
         public void onComplete() {
+
         }
     }
 

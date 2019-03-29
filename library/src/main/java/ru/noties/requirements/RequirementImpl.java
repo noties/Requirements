@@ -275,7 +275,7 @@ class RequirementImpl extends Requirement
         }
     }
 
-    private static class ListenerSource extends Listener {
+    private static class ListenerSource implements Listener {
 
         private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 

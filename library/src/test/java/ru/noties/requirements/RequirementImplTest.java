@@ -34,6 +34,8 @@ import static org.mockito.Mockito.when;
 public class RequirementImplTest {
 
     private EventDispatcher mockDispatcher;
+    private EventSource source;
+    private EventSource.Subscription subscription;
 
     @Before
     public void before() {
@@ -45,11 +47,14 @@ public class RequirementImplTest {
         when(activity.getApplication()).thenReturn(application);
 
         when(mockDispatcher.activity()).thenReturn(activity);
+
+        source = mock(EventSource.class);
+        subscription = mock(EventSource.Subscription.class);
+        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(subscription);
     }
 
     @Test
     public void validate_triggers_event_source_subscription() {
-        final EventSource source = mock(EventSource.class);
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
                 source,
@@ -60,10 +65,6 @@ public class RequirementImplTest {
 
     @Test
     public void validate_when_in_progress_does_not_trigger_event_source_subscription() {
-
-        final EventSource source = mock(EventSource.class);
-        // we should mock this method so we return non-null
-        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(mock(EventSource.Subscription.class));
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
@@ -84,7 +85,7 @@ public class RequirementImplTest {
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
-                mock(EventSource.class),
+                source,
                 Collections.<RequirementCase>emptyList());
 
         // check for synchronous method
@@ -117,9 +118,6 @@ public class RequirementImplTest {
         }
 
         final Case requirementCase = new Case();
-
-        final EventSource source = mock(EventSource.class);
-        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(mock(EventSource.Subscription.class));
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
@@ -189,7 +187,6 @@ public class RequirementImplTest {
             cases.add(new Case());
         }
 
-        final EventSource source = mock(EventSource.class);
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
                 source,
@@ -234,7 +231,7 @@ public class RequirementImplTest {
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
-                mock(EventSource.class),
+                source,
                 cases);
 
         assertFalse(impl.isValid());
@@ -277,8 +274,6 @@ public class RequirementImplTest {
             }
         }
         final SubscriptionImpl subscription = new SubscriptionImpl();
-
-        final EventSource source = mock(EventSource.class);
         when(source.subscribe(any(EventSource.Listener.class))).thenReturn(subscription);
 
         final List<RequirementCase> cases = Arrays.asList(mock(RequirementCase.class), mock(RequirementCase.class));
@@ -330,7 +325,7 @@ public class RequirementImplTest {
         });
     }
 
-    private static void assertDestroy(@NonNull Destroy destroy) {
+    private void assertDestroy(@NonNull Destroy destroy) {
 
         final class SubscriptionImpl implements EventSource.Subscription {
 
@@ -352,7 +347,6 @@ public class RequirementImplTest {
         final EventDispatcher dispatcher = mock(EventDispatcher.class);
         when(dispatcher.activity()).thenReturn(activity);
 
-        final EventSource source = mock(EventSource.class);
         when(source.subscribe(any(EventSource.Listener.class))).thenReturn(subscription);
 
         final RequirementCase requirementCase = mock(RequirementCase.class);
@@ -443,7 +437,7 @@ public class RequirementImplTest {
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
-                mock(EventSource.class),
+                source,
                 Collections.singletonList(requirementCase));
 
         assertFalse(impl.isInProgress());
@@ -462,8 +456,6 @@ public class RequirementImplTest {
     public void cancel_payload_delivered() {
 
         final RequirementCase requirementCase = mock(RequirementCase.class);
-        final EventSource source = mock(EventSource.class);
-        when(source.subscribe(any(EventSource.Listener.class))).thenReturn(mock(EventSource.Subscription.class));
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
@@ -512,7 +504,7 @@ public class RequirementImplTest {
 
         final RequirementImpl impl = new RequirementImpl(
                 mockDispatcher,
-                mock(EventSource.class),
+                source,
                 Collections.singletonList(requirementCase));
 
         final Requirement.Listener listener = mock(Requirement.Listener.class);

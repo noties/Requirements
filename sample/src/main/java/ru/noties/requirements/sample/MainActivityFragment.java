@@ -12,8 +12,6 @@ import ru.noties.debug.Debug;
 import ru.noties.requirements.BuildUtils;
 import ru.noties.requirements.Payload;
 import ru.noties.requirements.Requirement;
-import ru.noties.requirements.RequirementBuilder;
-import ru.noties.requirements.fragment.FragmentEventController;
 import ru.noties.requirements.sample.cases.LocationPermissionCase;
 import ru.noties.requirements.sample.cases.LocationServicesCase;
 import ru.noties.requirements.sample.cases.NetworkCase;
@@ -33,7 +31,7 @@ public class MainActivityFragment extends FragmentActivity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requirement.validate(new Requirement.Listener() {
+                requirement.validate(new Requirement.ListenerAdapter() {
                     @Override
                     public void onRequirementSuccess() {
                         Debug.i();
@@ -51,7 +49,7 @@ public class MainActivityFragment extends FragmentActivity {
     @SuppressLint("NewApi")
     @NonNull
     private Requirement createRequirement() {
-        return RequirementBuilder.create(FragmentEventController.get(this))
+        return Requirement.builder(this)
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())

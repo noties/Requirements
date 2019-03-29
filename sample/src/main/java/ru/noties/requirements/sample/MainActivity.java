@@ -15,7 +15,6 @@ import ru.noties.requirements.BuildUtils;
 import ru.noties.requirements.EventSource;
 import ru.noties.requirements.Payload;
 import ru.noties.requirements.Requirement;
-import ru.noties.requirements.RequirementBuilder;
 import ru.noties.requirements.sample.cases.LocationPermissionCase;
 import ru.noties.requirements.sample.cases.LocationServicesCase;
 import ru.noties.requirements.sample.cases.NetworkCase;
@@ -35,7 +34,7 @@ public class MainActivity extends Activity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                requirement.validate(new Requirement.Listener() {
+                requirement.validate(new Requirement.ListenerAdapter() {
                     @Override
                     public void onRequirementSuccess() {
                         // can proceed now
@@ -69,7 +68,7 @@ public class MainActivity extends Activity {
     @SuppressLint("NewApi")
     @NonNull
     private Requirement createRequirement() {
-        return RequirementBuilder.create(this, eventSource)
+        return Requirement.builder(this, eventSource)
                 .add(new NetworkCase())
                 .addIf(BuildUtils.isAtLeast(Build.VERSION_CODES.M), new LocationPermissionCase())
                 .add(new LocationServicesCase())

@@ -1,17 +1,17 @@
 # Requirements<sup><i>*</i></sup>
 
-Small utility library for Android to evaluate requirements in order for some action to proceed. For example: network connection, permissions (API 23), system services (location, bluetooth, ...), etc.
+Library for Android to evaluate requirements chain. For example: network connection, permissions (API 23), system services (location, bluetooth, ...), etc in one uninterrupted action.
 
 [![Maven Central](https://img.shields.io/maven-central/v/ru.noties/requirements.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22requirements%22)
 
 ```gradle
-implementation 'ru.noties:requirements:1.1.0'
+implementation 'ru.noties:requirements:2.0.0'
 ```
 
 
 ## Overview
 
-In order to correctly react to a user action we must make sure that all requirements are satisfied for this action to proceed. Sometimes it's just _network connection_. Sometimes it's _location services_ and, on devices starting Marshmallow, the _location permission_. The list goes forth. So does the code in an Activity or a Fragment.
+If a user action requires multiple conditions to be met (for example network connectivity, In order to react to a user action we must make sure that all requirements are satisfied for this action to proceed. Sometimes it's just _network connection_. Sometimes it's _location services_ and, on devices starting Marshmallow, the _location permission_. The list goes forth. So does the code in an Activity or a Fragment.
 
 The aim of this library is to detach requirements' resolution process from the code and give flexibility to add/remove requirements on-the-go.
 
